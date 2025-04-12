@@ -1,0 +1,7 @@
+# Python environment
+backend/__pycache__/
+backend/venv/
+backend/.env
+
+# Docker files
+docker/*.log
