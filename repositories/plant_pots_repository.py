@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from core.config import MONGO_URI, DB_NAME
+from bson import ObjectId
 
 class PlantPotsRepository:
     def __init__(self):
@@ -18,5 +19,11 @@ class PlantPotsRepository:
     def get_pot(self, pot_id: str):
         return self.collection.find_one({"_id": pot_id})
 
-    def update_pot(self, pot_id: str, update_data: dict):
-        return self.collection.update_one({"_id": pot_id}, {"$set": update_data})
+    def update_pot(self, pot_id: str, data: dict):
+        return self.collection.update_one({"_id": pot_id}, {"$set": data})
+
+    def delete_pot(self, pot_id: str):
+        return self.collection.delete_one({"_id": pot_id})
+
+    def get_by_environment(self, environment_id: str):
+        return list(self.collection.find({"environment_id": ObjectId(environment_id)}))
