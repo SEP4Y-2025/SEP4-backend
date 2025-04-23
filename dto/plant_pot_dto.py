@@ -15,4 +15,4 @@ class PlantPotResponse(BaseModel):
     plant_type_name: str
     watering_frequency: int
     water_dosage: int
-    envronment_id: str
+    environment_id: str

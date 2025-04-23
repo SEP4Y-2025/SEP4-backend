@@ -60,7 +60,7 @@ class PlantPotsService:
             plant_type_name=plant_type["plant_type_name"],
             watering_frequency=plant_type["watering_frequency"],
             water_dosage=plant_type["water_dosage"],
-            envronment_id=pot_doc["environment_id"]
+            environment_id=pot_doc["environment_id"]
         )
 
     def delete_plant_pot(self, pot_id: str) -> bool:
