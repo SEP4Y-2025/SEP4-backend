@@ -34,4 +34,11 @@ def get_logs():
         # Handle unexpected errors
         raise HTTPException(status_code=500, detail=str(e))
     
-    
+@router.get("/pots/environments/{environment_id}")
+def get_pots_by_environment(environment_id: str):
+    try:
+        service = PlantPotsService()
+        pots = service.get_pots_by_environment(environment_id)
+        return {"pots": pots}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

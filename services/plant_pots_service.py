@@ -32,4 +32,7 @@ class PlantPotsService:
         return PlantPotResponse(
             message="Pot added successfully",
             **pot.model_dump())
+    
+    def get_pots_by_environment(self, environment_id: str):
+        return self.repository.get_pots_by_environment(environment_id)
         
