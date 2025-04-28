@@ -28,10 +28,8 @@ async def create_plant_type(plant_data: PlantTypeRequest):
             "water_amount": plant_data.water_amount
         }
         
-        # Insert into MongoDB
         result = collection.insert_one(new_plant_type)
         
-        # Return success response
         return {
             "message": "Plant type created successfully",
             "id": str(result.inserted_id),
@@ -40,7 +38,6 @@ async def create_plant_type(plant_data: PlantTypeRequest):
             "water_amount": plant_data.water_amount
         }
     except Exception as e:
-        # Log the error here if you have logging set up
         print(f"Error creating plant type: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create plant type: {str(e)}")
     
