@@ -20,3 +20,6 @@ class PlantPotsRepository:
 
     def update_pot(self, pot_id: str, update_data: dict):
         return self.collection.update_one({"_id": pot_id}, {"$set": update_data})
+
+    def get_pots_by_environment(self, environment_id: str):
+        return list(self.collection.find({"environment_id": environment_id}))
