@@ -1,6 +1,6 @@
 # service/pots_service.py
 
-from models.plant_pot import AddPlantPotRequest, PlantPotResponse
+from models.plant_pot import AddPlantPotRequest, PlantPotResponse, GetPlantPotResponse
 from repositories.plant_pots_repository import PlantPotsRepository
 from repositories.arduinos_repository import ArduinosRepository
 from core.mqtt_client import mqtt_client
@@ -32,6 +32,13 @@ class PlantPotsService:
         return PlantPotResponse(
             message="Pot added successfully",
             **pot.model_dump())
+
+    def get_plant_pot_by_id(self, pot_id: str):
+        pot = self.repository.find_pot_by_id(pot_id)
+        if not pot:
+            raise ValueError("PlantPot with Id " + pot_id + " not found")
+    
+        return pot
     
     def get_pots_by_environment(self, environment_id: str):
         return self.repository.get_pots_by_environment(environment_id)

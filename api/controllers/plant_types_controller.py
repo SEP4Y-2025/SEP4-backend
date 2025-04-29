@@ -1,7 +1,6 @@
 # api/endpoints/plant_types.py
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
 from services.plant_types_service import PlantTypesService
 from models.plant_type import GetAllPlantRequest, GetAllPlantResponse
 
