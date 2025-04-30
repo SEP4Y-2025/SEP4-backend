@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 from urllib.parse import urlparse
 from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
 from pymongo import MongoClient
+from repositories.sensor_readings_repository import SensorReadingsRepository
 
 
 # MongoDB Client Setup
@@ -16,9 +17,29 @@ class MQTTClient:
         self.client = mqtt.Client(client_id="backend")
         self.response_queues = {}  # Dictionary to hold response queues for each request
         self.client.on_message = self.on_message
+        self.sensor_readings_repo = SensorReadingsRepository()
+
+        
 
     def on_message(self, client, userdata, msg):
         print(f"Received message on topic {msg.topic}")
+        
+        ###########################################################
+        # This is temporary code to handle light sensor data
+        if(msg.topic == "light"):
+            payload_str = msg.payload.decode('utf-8') 
+            lines = payload_str.strip().split('\n')
+            for line in lines:
+                if "Light ADC Val:" in line:
+                    parts = line.split(":")
+                    if len(parts) == 2:
+                            value = int(parts[1].strip())
+                            self.sensor_readings_repo.create({"light": value})
+                            return
+                    else :
+                        return
+        
+        ############################################################
         data = json.loads(msg.payload.decode())
         correlation_id = data.get("correlation_id")
         print(f"Received message with correlation ID {correlation_id}")
@@ -32,6 +53,8 @@ class MQTTClient:
         parsed = urlparse(MQTT_BROKER_URL)
         self.client.connect(parsed.hostname or "mqtt", parsed.port or 1883)
         self.client.loop_start()
+        #############################################
+        self.client.subscribe("light")
 
 
     def send(self, topic: str, payload:dict,timeout=5):
