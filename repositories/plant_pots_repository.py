@@ -26,3 +26,6 @@ class PlantPotsRepository:
 
     def get_pots_by_environment(self, environment_id: str):
         return list(self.collection.find({"environment_id": environment_id}))
+    
+    def delete_pot(self, pot_id: str):
+        return self.collection.delete_one({"_id": pot_id})

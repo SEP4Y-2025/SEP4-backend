@@ -42,4 +42,12 @@ class PlantPotsService:
     
     def get_pots_by_environment(self, environment_id: str):
         return self.repository.get_pots_by_environment(environment_id)
+    
+    def delete_plant_pot(self, pot_id: str):
+        pot = self.repository.find_pot_by_id(pot_id)
+        if not pot:
+            raise ValueError("Plant pot with id " + pot_id + " not found")
+        self.repository.delete_pot(pot_id)
+        
+        
         
