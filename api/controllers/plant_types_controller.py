@@ -23,6 +23,8 @@ class AddPlantTypeRequest(BaseModel):
     watering_freq: int
     water_dosage: int
 
+#testing
+
 class AddPlantTypeResponse(BaseModel):
     message: str
     plantTypeId: str
