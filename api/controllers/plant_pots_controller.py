@@ -4,6 +4,8 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from services.plant_pots_service import PlantPotsService
 from models.plant_pot import AddPlantPotRequest, PlantPotResponse
+from bson import ObjectId
+from core.config import MONGO_URI
 
 router = APIRouter()
 
@@ -35,21 +37,28 @@ def get_logs():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/plant_pots/{pot_id}")
+@router.get("/environments/{environment_id}/pots/{pot_id}")
 def get_plant_pot(pot_id: str):
-    print("Received GET /pot with id:", pot_id)
     try:
-        return PlantPotsService().get_plant_pot_by_id(pot_id)
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        pot = PlantPotsService().get_plant_pot_by_id(pot_id)
+        if not pot:
+            return {"detail": f"PlantPot with Id {pot_id} not found"}
+        return {"pot": pot}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"detail": f"Unexpected error: {str(e)}"}
     
-@router.get("/pots/environments/{environment_id}")
+@router.get("/environments/{environment_id}/pots")
 def get_pots_by_environment(environment_id: str):
     try:
+        if not ObjectId.is_valid(environment_id):
+            raise HTTPException(status_code=400, detail="Invalid environment ID")
+        
         service = PlantPotsService()
         pots = service.get_pots_by_environment(environment_id)
+        
+        if not pots:
+            raise HTTPException(status_code=404, detail="No plant pots found for the given environment")
+        
         return {"pots": pots}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")

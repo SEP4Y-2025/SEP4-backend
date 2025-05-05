@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URL", "mongodb://mongo:27017")
+MONGO_URI = os.getenv("MONGO_URL", "mongodb://admin:password@localhost:27017/admin")
 DB_NAME = "sep_database"
-MQTT_BROKER_URL = os.getenv("MQTT_BROKER_URL", "mqtt://mqtt:1883")
+MQTT_BROKER_URL = os.getenv("MQTT_BROKER_URL", "mqtt://localhost:1883")
 MQTT_PORT = int(os.getenv("MQTT_PORT", 1883))

@@ -14,3 +14,11 @@ class PlantPotResponse(BaseModel):
     plant_pot_label: str
     watering_frequency: int
     water_dosage: int
+
+    # Add this to your models/pot.py (or plant_pot.py)
+class GetPlantPotResponse(BaseModel):
+    pot_id: str
+    plant_pot_label: str
+    watering_frequency: int
+    water_dosage: int
+    # Add any other fields needed for retrieving a plant potdis
