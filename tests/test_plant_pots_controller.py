@@ -18,8 +18,11 @@ def test_add_plant_pot_success(client):
         "message": "Pot added successfully",
         "pot_id": "pot_1",
         "plant_pot_label": "green pot",
+        "plant_type_id": "67fce650e50105831f316bff",
+        "plant_type_name": "mint",
         "watering_frequency": 3,
-        "water_dosage": 300
+        "water_dosage": 300,
+        "environment_id": "1"
     }
 
     payload = {
@@ -34,3 +37,16 @@ def test_add_plant_pot_success(client):
         response = client.post("/environments/1/pots", json=payload)
         assert response.status_code == 200
         assert response.json() == mock_response
+
+
+def test_add_pot_missing_field(client):
+    payload = {
+        "plant_pot_label": "green pot",
+        "plant_type_id": "67fce650e50105831f316bff",
+        "watering_frequency": 3,
+        "water_dosage": 300
+        # Missing "pot_id"
+    }
+    response = client.post("/environments/1/pots", json=payload)
+    assert response.status_code == 422
+
