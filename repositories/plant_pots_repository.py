@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 from core.config import MONGO_URI, DB_NAME
+from bson import ObjectId
+from utils.helper import convert_object_ids
 
 class PlantPotsRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
-        self.collection = self.db["plant_pots"]
+        self.collection = self.db["environments"]
 
     def insert_pot(self, pot_data: dict):
         try:
@@ -22,7 +24,13 @@ class PlantPotsRepository:
         return self.collection.update_one({"_id": pot_id}, {"$set": update_data})
     
     def find_pot_by_id(self, pot_id: str): 
-        return self.collection.find_one({"_id": pot_id})
+        pot_obj_id = ObjectId(pot_id)
+        environment = self.collection.find_one({"plantPots.potId": pot_obj_id})
+        if environment:
+            for pot in environment["plantPots"]:
+                if pot["potId"] == pot_obj_id:
+                    return convert_object_ids(pot)
+        return None
 
     def get_pots_by_environment(self, environment_id: str):
         return list(self.collection.find({"environment_id": environment_id}))
