@@ -63,16 +63,16 @@ def get_pots_by_environment(environment_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.delete("/pots/{pot_id}")
+@router.delete("/enivironments/{environment_id}/pots/{pot_id}")
 def delete_plant_pot(pot_id: str):
-        try:
-            PlantPotsService().delete_plant_pot(pot_id)
-            return {"message": f"Plant pot with ID {pot_id} is deleted successfully."}
-        except ValueError as e:
-            raise HTTPException(status_code=404, detail=str(e))
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-    
+    try:
+        service = PlantPotsService()
+        service.delete_plant_pot(pot_id)
+        return {"message": "Plant pot deleted successfully"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
     
     

@@ -36,4 +36,9 @@ class PlantPotsRepository:
         return list(self.collection.find({"environment_id": environment_id}))
     
     def delete_pot(self, pot_id: str):
-        return self.collection.delete_one({"_id": pot_id})
+        pot_obj_id = ObjectId(pot_id)
+        environment = self.collection.find_one({"plantPots.potId": pot_obj_id})
+        if environment:
+            self.collection.delete_one({"plantPots.potId": pot_obj_id})
+            return True
+        
