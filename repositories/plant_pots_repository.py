@@ -44,13 +44,12 @@ class PlantPotsRepository:
             print(f"Error fetching pots by environment: {e}")
             return []
 
-def delete_pot(self, pot_id: str):
-    pot_obj_id = ObjectId(pot_id)
-    result = self.collection.update_one(
-        {"plantPots.potId": pot_obj_id},  # Find the environment containing the plant pot
-        {"$pull": {"plantPots": {"potId": pot_obj_id}}}  # Remove the specific plant pot from the array
-    )
-    if result.modified_count == 0:
-        raise ValueError(f"No plant pot found with ID {pot_id}")
-    return True
-
+    def delete_pot(self, pot_id: str):
+        pot_obj_id = ObjectId(pot_id)
+        result = self.collection.update_one(
+            {"plantPots.potId": pot_obj_id},  # Find the environment containing the plant pot
+            {"$pull": {"plantPots": {"potId": pot_obj_id}}}  # Remove the specific plant pot from the array
+        )
+        if result.modified_count == 0:
+            raise ValueError(f"No plant pot found with ID {pot_id}")
+        return True

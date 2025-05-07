@@ -63,7 +63,7 @@ def get_pots_by_environment(environment_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-@router.delete("/enivironments/{environment_id}/pots/{pot_id}")
+@router.delete("/environments/{environment_id}/pots/{pot_id}")
 def delete_plant_pot(pot_id: str):
     try:
         service = PlantPotsService()
