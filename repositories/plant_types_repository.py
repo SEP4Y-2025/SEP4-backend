@@ -23,22 +23,12 @@ class PlantTypesRepository:
     def get_plant_types_by_environment(self, environment_id: str):
         try:
             env_obj_id = ObjectId(environment_id)
-            environment = self.env_collection.find_one({"_id": env_obj_id})
 
-            if not environment:
-                print(f"Environment with ID {environment_id} not found.")
+            plant_types = list(self.plant_type_collection.find({"plant_env_id": env_obj_id}))
+
+            if not plant_types:
+                print(f"No plant types found for environment ID {environment_id}.")
                 return []
-
-            print(f"Environment found: {environment}")
-
-            # Extract unique plantTypeIds from plantPots
-            plant_pots = environment.get("plantPots", [])
-            plant_type_ids = {
-                pot["plantTypeId"] for pot in plant_pots if "plantTypeId" in pot
-            }
-
-            # Fetch matching plant type documents
-            plant_types = list(self.plant_type_collection.find({"_id": {"$in": list(plant_type_ids)}}))
 
             return convert_object_ids(plant_types)
 
