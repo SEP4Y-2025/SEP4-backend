@@ -19,8 +19,8 @@ def get_plant_types_by_environment(environment_id: str):
 from pydantic import BaseModel
 
 class AddPlantTypeRequest(BaseModel):
-    plant_type_name: str
-    watering_freq: int
+    name: str
+    water_frequency: int
     water_dosage: int
 
 #testing

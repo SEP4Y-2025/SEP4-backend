@@ -18,7 +18,7 @@ class PlantTypesService:
     
     def add_plant_type(self, plant_type: dict):
         # Validate required fields
-        if not plant_type.get("plant_type_name") or not plant_type.get("plant_env_id"):
+        if not plant_type.get("name") or not plant_type.get("plant_env_id"):
             raise ValueError("Invalid plant type data: 'plant_type_name' and 'plant_env_id' are required")
 
         # Check if the environment exists
