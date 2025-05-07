@@ -33,12 +33,24 @@ class PlantPotsRepository:
         return None
 
     def get_pots_by_environment(self, environment_id: str):
-        return list(self.collection.find({"environment_id": environment_id}))
-    
-    def delete_pot(self, pot_id: str):
-        pot_obj_id = ObjectId(pot_id)
-        environment = self.collection.find_one({"plantPots.potId": pot_obj_id})
-        if environment:
-            self.collection.delete_one({"plantPots.potId": pot_obj_id})
-            return True
-        
+        try:
+            env_obj_id = ObjectId(environment_id)
+            environment = self.collection.find_one({"_id": env_obj_id})
+            pots = environment.get("plantPots", [])
+            return convert_object_ids(pots)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"Error fetching pots by environment: {e}")
+            return []
+
+def delete_pot(self, pot_id: str):
+    pot_obj_id = ObjectId(pot_id)
+    result = self.collection.update_one(
+        {"plantPots.potId": pot_obj_id},  # Find the environment containing the plant pot
+        {"$pull": {"plantPots": {"potId": pot_obj_id}}}  # Remove the specific plant pot from the array
+    )
+    if result.modified_count == 0:
+        raise ValueError(f"No plant pot found with ID {pot_id}")
+    return True
+
