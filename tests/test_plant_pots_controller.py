@@ -50,3 +50,26 @@ def test_add_pot_missing_field(client):
     response = client.post("/environments/1/pots", json=payload)
     assert response.status_code == 422
 
+def test_get_plant_pot_success(client):
+    mock_pot = {
+        "pot_id": "60f6f48e8d3f5b001f0e4d2b",
+        "plant_pot_label": "Green Mint Pot",
+        "watering_frequency": 3,
+        "water_dosage": 250,
+        "env_id": "234ab", 
+        "plant_type_id": "456gh" 
+    }
+
+    with patch("services.plant_pots_service.PlantPotsService.get_plant_pot_by_id", return_value=mock_pot):
+        response = client.get("/environments/234ab/pots/60f6f48e8d3f5b001f0e4d2b")
+        assert response.status_code == 200
+        assert response.json() == {"pot": mock_pot}
+
+def test_get_plant_pot_not_found(client):
+    environment_id = "234ab" 
+    non_existent_pot_id = "nonexistentpotid" 
+
+    with patch("services.plant_pots_service.PlantPotsService.get_plant_pot_by_id", return_value=None):
+        response = client.get(f"/environments/{environment_id}/pots/{non_existent_pot_id}")
+        assert response.status_code == 200
+        assert response.json() == {"detail": f"PlantPot with Id {non_existent_pot_id} not found"}
