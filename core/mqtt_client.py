@@ -19,35 +19,33 @@ class MQTTClient:
         self.client.on_message = self.on_message
         self.sensor_readings_repo = SensorReadingsRepository()
 
-        
-
     def on_message(self, client, userdata, msg):
         print(f"Received message on topic {msg.topic}")
         
         ###########################################################
         # This is temporary code to handle light sensor data
-        if(msg.topic == "light"):
-            payload_str = msg.payload.decode('utf-8') 
-            lines = payload_str.strip().split('\n')
-            for line in lines:
-                if "Light ADC Val:" in line:
-                    parts = line.split(":")
-                    if len(parts) == 2:
-                            value = int(parts[1].strip())
-                            self.sensor_readings_repo.create({"light": value})
-                            return
-                    else :
-                        return
-        
+        # if(msg.topic == "light"):
+        #     payload_str = msg.payload.decode('utf-8') 
+        #     lines = payload_str.strip().split('\n')
+        #     for line in lines:
+        #         if "Light ADC Val:" in line:
+        #             parts = line.split(":")
+        #             if len(parts) == 2:
+        #                     value = int(parts[1].strip())
+        #                     self.sensor_readings_repo.create({"light": value})
+        #                     return
+        #             else :
+        #                 return
+        # return
         ############################################################
+        
         data = json.loads(msg.payload.decode())
-        correlation_id = data.get("correlation_id")
-        print(f"Received message with correlation ID {correlation_id}")
+        print(f"Received message with {data}")
 
-        # Find the appropriate queue based on correlation_id and put the message in the queue
-        if correlation_id and correlation_id in self.response_queues:
-            self.response_queues[correlation_id].put(data)
-            pending_requests_collection.delete_one({"correlation_id": correlation_id})  # Remove from pending requests
+        # Find the appropriate queue based on response topic and put the message in the queue
+        if msg.topic and msg.topic in self.response_queues:
+             self.response_queues[msg.topic].put(data)
+             pending_requests_collection.delete_one({"response_topic": msg.topic})  # Remove from pending requests
             
     def start(self):
         parsed = urlparse(MQTT_BROKER_URL)
@@ -57,14 +55,13 @@ class MQTTClient:
         self.client.subscribe("light")
 
 
-    def send(self, topic: str, payload:dict,timeout=5):
-        correlation_id = str(uuid.uuid4())
+    def send(self, topic: str, payload:dict, timeout=20):
         response_queue = queue.Queue()  # Create a new response queue for each request
-        self.response_queues[correlation_id] = response_queue  # Store the response queue by correlation ID
-
-        payload["correlation_id"] = correlation_id
-        response_topic = f"{topic}/{correlation_id}"
         
+        response_topic = f"{topic}/ok"
+
+        self.response_queues[f"{response_topic}"] = response_queue 
+
         # Subscribe to the response topic
         self.client.subscribe(response_topic)
         
@@ -72,7 +69,7 @@ class MQTTClient:
         self.client.publish(topic, json.dumps(payload))
         
         pending_requests_collection.insert_one({
-            "correlation_id": correlation_id,
+            "response_topic": response_topic,
             "topic": topic,
             "payload": payload,
             "status": "pending",  # Initially mark as pending
@@ -91,11 +88,11 @@ class MQTTClient:
                 continue
             
         # Timeout or no valid response
-        del self.response_queues[correlation_id]
+        del self.response_queues[response_topic]
 
         # Update the request in the database to reflect timeout or failure
         pending_requests_collection.update_one(
-            {"correlation_id": correlation_id},
+            {"response_topic": response_topic},
             {"$set": {"status": "timeout", "response": None}}
         )
         

@@ -27,7 +27,7 @@ class PlantPotsService:
 
         # Send MQTT command to hardware
         payload = {
-            "command": "pots/add",
+            "command": "pot/activate",
             "pot_id": pot.pot_id,
             "frequency": plant_type["watering_frequency"],
             "dosage": plant_type["water_dosage"]
@@ -35,7 +35,7 @@ class PlantPotsService:
         
         print("Sending command to MQTT broker:", payload)
         
-        result = mqtt_client.send(f"pots/{pot.pot_id}/add", payload)
+        result = mqtt_client.send(f"/{pot.pot_id}/activate", payload)
 
         if result.get("error"):
             raise ValueError(result["error"])
@@ -76,10 +76,10 @@ class PlantPotsService:
 
         # Send MQTT delete command
         payload = {
-            "command": "pots/delete",
+            "command": "pot/deactivate",
             "pot_id": pot_id
         }
-        result = mqtt_client.send(f"pots/{pot_id}/delete", payload)
+        result = mqtt_client.send(f"/{pot_id}/deactivate", payload)
 
         if result.get("error"):
             raise ValueError(result["error"])
