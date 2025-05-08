@@ -9,6 +9,9 @@ class PlantTypesRepository:
         self.db = self.client[DB_NAME]
         self.env_collection = self.db["environments"]      # for environments
         self.plant_type_collection = self.db["plant_types"]  # for plant types
+        
+    def get_plant_type_by_id(self, plant_type_id: str):
+        return self.plant_type_collection.find_one({"_id": ObjectId(plant_type_id)})
 
     def get_environment_by_id(self, environment_id: str):
         try:
