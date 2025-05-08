@@ -3,6 +3,3 @@ uvicorn
 pymongo
 paho-mqtt
 python-multipart
-pytest 
-httpx 
-pytest-asyncio
