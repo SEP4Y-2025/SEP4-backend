@@ -1,5 +1,6 @@
 # core/mqtt_client.py
 import json, time, uuid, queue
+import datetime
 import paho.mqtt.client as mqtt
 from urllib.parse import urlparse
 from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
@@ -41,6 +42,26 @@ class MQTTClient:
         
         data = json.loads(msg.payload.decode())
         print(f"Received message with {data}")
+        
+        if(msg.topic == "/pot_1/sensors"):
+            timestamp = time.time()
+            dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
+            
+            # (ISO 8601)
+            formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+            # Extract the sensor data from the message
+            
+            sensor_data = {
+                "temperature": data.get("temperature"),
+                "air_humidity": data.get("air_humidity"),
+                "soil_humidity": data.get("soil_humidity"),
+                "light_intensity": data.get("light_intensity"),
+                "plant_pot_id": data.get("plant_pot_id"),
+                "timestamp": formatted_time
+            }
+            # Store the sensor data in the database
+            self.sensor_readings_repo.create(sensor_data)
+            return
 
         # Find the appropriate queue based on response topic and put the message in the queue
         if msg.topic and msg.topic in self.response_queues:
@@ -52,7 +73,7 @@ class MQTTClient:
         self.client.connect(parsed.hostname or "mqtt", parsed.port or 1883)
         self.client.loop_start()
         #############################################
-        self.client.subscribe("light")
+        self.client.subscribe("/pot_1/sensors")
 
 
     def send(self, topic: str, payload:dict, timeout=20):
