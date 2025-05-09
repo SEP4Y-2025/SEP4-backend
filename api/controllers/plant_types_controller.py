@@ -3,6 +3,8 @@
 from fastapi import APIRouter, HTTPException
 from services.plant_types_service import PlantTypesService
 
+from pydantic import BaseModel
+
 router = APIRouter()
 
 
@@ -18,16 +20,10 @@ def get_plant_types_by_environment(environment_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-from pydantic import BaseModel
-
-
 class AddPlantTypeRequest(BaseModel):
     name: str
     water_frequency: int
     water_dosage: int
-
-
-# testing
 
 
 class AddPlantTypeResponse(BaseModel):

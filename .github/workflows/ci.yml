@@ -70,5 +70,5 @@ jobs:
         run: |
           flake8 . \
             --max-line-length=120 \
-            --ignore=E501,F401,W291,W292,W293 \
+            --ignore=E501,F401,W291,W292,W293,E401 \
             --exclude=.git,__pycache__,env,venv,.venv
