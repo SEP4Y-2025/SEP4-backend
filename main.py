@@ -18,8 +18,4 @@ app.add_middleware(
 app.include_router(pots_router)
 app.include_router(plant_types_router)
 
-#mqtt_client.start()
-
-
-
-
+# mqtt_client.start()

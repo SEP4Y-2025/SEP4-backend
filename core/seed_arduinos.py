@@ -17,7 +17,7 @@ initial_arduinos = [
     {"_id": "pot_3", "active": False},
     {"_id": "pot_4", "active": False},
     {"_id": "pot_5", "active": False},
-    {"_id": "pot_6", "active": False}
+    {"_id": "pot_6", "active": False},
 ]
 
 # Initial environment data
@@ -28,11 +28,7 @@ initial_envs = [
         "ownerId": ObjectId("662ebf49c7b9e2a7681e4a53"),
         "windowState": "closed",
         "temperature": 20,
-        "accessControl": [
-            {
-                "userId": ObjectId("662ebf49c7b9e2a7681e4a53")
-            }
-        ],
+        "accessControl": [{"userId": ObjectId("662ebf49c7b9e2a7681e4a53")}],
         "plantPots": [
             {
                 "potId": ObjectId("662ebf49c7b9e2a7681e4a54"),
@@ -40,14 +36,14 @@ initial_envs = [
                 "state": {
                     "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
                     "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 20]
+                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 20],
                 },
                 "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "waterTank": {
                     "capacityMl": 1000,
                     "currentLevelMl": 750,
-                    "status": "active"
-                }
+                    "status": "active",
+                },
             },
             {
                 "potId": ObjectId("662ebf49c7b9e2a7681e4a56"),
@@ -55,14 +51,14 @@ initial_envs = [
                 "state": {
                     "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
                     "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 24]
+                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 24],
                 },
                 "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "waterTank": {
                     "capacityMl": 1000,
                     "currentLevelMl": 500,
-                    "status": "active"
-                }
+                    "status": "active",
+                },
             },
             {
                 "potId": ObjectId("662ebf49c7b9e2a7681e4a57"),
@@ -70,16 +66,16 @@ initial_envs = [
                 "state": {
                     "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
                     "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 18]
+                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 18],
                 },
                 "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a58"),
                 "waterTank": {
                     "capacityMl": 1000,
                     "currentLevelMl": 900,
-                    "status": "active"
-                }
-            }
-        ]
+                    "status": "active",
+                },
+            },
+        ],
     }
 ]
 
@@ -90,22 +86,22 @@ plant_types = [
         "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Rose",
         "water_dosage": 50,
-        "water_frequency": 2
+        "water_frequency": 2,
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a58"),
         "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Tulip",
         "water_dosage": 40,
-        "water_frequency": 3
+        "water_frequency": 3,
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a59"),
         "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Sunflower",
         "water_dosage": 60,
-        "water_frequency": 1
-    }
+        "water_frequency": 1,
+    },
 ]
 
 # Insert plant types
