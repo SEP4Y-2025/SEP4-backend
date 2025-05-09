@@ -33,8 +33,6 @@ class PlantPotsRepository:
             except Exception as e:
                 print(f"Error inserting pot: {e}")
                 return None
-    def get_pot(self, pot_id: str):
-        return self.plant_pots_collection.find_one({"_id": pot_id})
 
     def update_pot(self, pot_id: str, update_data: dict):
         return self.plant_pots_collection.update_one({"_id": pot_id}, {"$set": update_data})

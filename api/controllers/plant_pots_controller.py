@@ -3,12 +3,12 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from services.plant_pots_service import PlantPotsService
-from models.plant_pot import AddPlantPotRequest, PlantPotResponse
+from models.plant_pot import AddPlantPotRequest, AddPlantPotResponse
 from bson import ObjectId
 
 router = APIRouter()
 
-@router.post("/environments/{env_id}/pots", response_model=PlantPotResponse)
+@router.post("/environments/{env_id}/pots", response_model=AddPlantPotResponse)
 def add_plant_pot(env_id : str, pot: AddPlantPotRequest):
     print("Received POST /pots with:", pot.model_dump())
     try:
@@ -37,9 +37,9 @@ def get_logs():
 
 
 @router.get("/environments/{environment_id}/pots/{pot_id}")
-def get_plant_pot(pot_id: str):
+def get_plant_pot(environment_id: str, pot_id: str):
     try:
-        pot = PlantPotsService().get_plant_pot_by_id(pot_id)
+        pot = PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
         if not pot:
             return {"detail": f"PlantPot with Id {pot_id} not found"}
         return {"pot": pot}
