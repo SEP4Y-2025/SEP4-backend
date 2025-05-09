@@ -86,7 +86,7 @@ class PlantPotsService:
         
         pot = self.plant_pots_repo.find_pot_by_id(pot_id)
         if not pot:
-            raise ValueError("Plant pot with ID " + pot_id + " not found")
+            raise ValueError(f"Plant pot with ID {pot_id} not found")
         
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
         
@@ -120,7 +120,7 @@ class PlantPotsService:
         print("Registered pot - good\n")
 
         # Get the pot from DB first to gather full info (before deletion)
-        pot = self.plant_pots_repo.get_pot(pot_id)
+        pot = self.plant_pots_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError("Plant pot not found")
 

@@ -61,12 +61,11 @@ class MQTTClient:
         }
 
         result = self.plant_pots_repo.update_pot(pot_id, update_data)
-            #upsert=False  # change to True to insert a new pot if not found
         
         print(f"Pots: {self.plant_pots_repo.find_pot_by_id(pot_id)}")
 
         if result.matched_count == 0:
-            raise ValueError(f"No plant pot found with ID {pot_id}")
+            print(f"Pot ID {pot_id} not updated")
 
     def on_message(self, client, userdata, msg):
         print(f"Received message on topic {msg.topic}")

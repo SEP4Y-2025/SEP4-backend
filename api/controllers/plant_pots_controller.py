@@ -39,12 +39,11 @@ def get_logs():
 @router.get("/environments/{environment_id}/pots/{pot_id}")
 def get_plant_pot(environment_id: str, pot_id: str):
     try:
-        pot = PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
-        if not pot:
-            return {"detail": f"PlantPot with Id {pot_id} not found"}
-        return {"pot": pot}
+        return PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        return {"detail": f"Unexpected error: {str(e)}"}
+        raise HTTPException(status_code=500, detail=str(e))
     
 @router.get("/environments/{environment_id}/pots")
 def get_pots_by_environment(environment_id: str):
