@@ -31,6 +31,6 @@ class GetPlantPotResponse(BaseModel):
     temperature_celsius: float
     light_intensity_lux: int
     water_tank_capacity_ml: int
-    current_water_level_percentage: int
+    water_level_percentage: int
     measured_at: datetime
     

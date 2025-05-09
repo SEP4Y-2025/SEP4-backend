@@ -6,6 +6,8 @@ from urllib.parse import urlparse
 from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
 from pymongo import MongoClient
 from repositories.sensor_readings_repository import SensorReadingsRepository
+from repositories.plant_pots_repository import PlantPotsRepository
+
 
 
 # MongoDB Client Setup
@@ -19,38 +21,16 @@ class MQTTClient:
         self.response_queues = {}  # Dictionary to hold response queues for each request
         self.client.on_message = self.on_message
         self.sensor_readings_repo = SensorReadingsRepository()
+        self.plant_pots_repo = PlantPotsRepository()
 
-    def on_message(self, client, userdata, msg):
-        print(f"Received message on topic {msg.topic}")
-        
-        ###########################################################
-        # This is temporary code to handle light sensor data
-        # if(msg.topic == "light"):
-        #     payload_str = msg.payload.decode('utf-8') 
-        #     lines = payload_str.strip().split('\n')
-        #     for line in lines:
-        #         if "Light ADC Val:" in line:
-        #             parts = line.split(":")
-        #             if len(parts) == 2:
-        #                     value = int(parts[1].strip())
-        #                     self.sensor_readings_repo.create({"light": value})
-        #                     return
-        #             else :
-        #                 return
-        # return
-        ############################################################
-        
-        data = json.loads(msg.payload.decode())
-        print(f"Received message with {data}")
-        
-        if(msg.topic == "/pot_1/sensors"):
+    def handle_sensor_readings(self, data):
             timestamp = time.time()
             dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
             
             # (ISO 8601)
             formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
             # Extract the sensor data from the message
-            
+
             sensor_data = {
                 "temperature": data.get("temperature"),
                 "air_humidity": data.get("air_humidity"),
@@ -62,12 +42,51 @@ class MQTTClient:
             # Store the sensor data in the database
             self.sensor_readings_repo.create(sensor_data)
             return
+    
+    def handle_get_pot_data(self, data):
+        timestamp = time.time()
+        dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
+        formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        pot_id = data.get("plant_pot_id")
+    
+        update_data = {
+            "temperature_celsius": data.get("temperature_celsius"),
+            "air_humidity_percentage": data.get("air_humidity_percentage"),
+            "soil_humidity_percentage": data.get("soil_humidity_percentage"),
+            "light_intensity_lux": data.get("light_intensity_lux"),
+            "water_tank_capacity_ml": data.get("water_tank_capacity_ml"),
+            "water_level_percentage": data.get("water_level_percentage"),
+            "measured_at": formatted_time,
+        }
+
+        result = self.plant_pots_repo.update_pot(pot_id, update_data)
+            #upsert=False  # change to True to insert a new pot if not found
+        
+        print(f"Pots: {self.plant_pots_repo.find_pot_by_id(pot_id)}")
+
+        if result.matched_count == 0:
+            raise ValueError(f"No plant pot found with ID {pot_id}")
+
+    def on_message(self, client, userdata, msg):
+        print(f"Received message on topic {msg.topic}")
+        
+        data = json.loads(msg.payload.decode())
+        print(f"Received message with {data}")
+        
+        if msg.topic and msg.topic.endswith("/sensors"):
+            self.handle_sensor_readings(data)
+
 
         # Find the appropriate queue based on response topic and put the message in the queue
         if msg.topic and msg.topic in self.response_queues:
              self.response_queues[msg.topic].put(data)
              pending_requests_collection.delete_one({"response_topic": msg.topic})  # Remove from pending requests
-            
+             
+        if msg.topic and msg.topic.endswith("/data/ok"):
+            self.handle_get_pot_data(data)
+        
+        #return response_queue
     def start(self):
         parsed = urlparse(MQTT_BROKER_URL)
         self.client.connect(parsed.hostname or "mqtt", parsed.port or 1883)
