@@ -1,4 +1,4 @@
-name: Debug SSH Connection
+name: Deploy Application to Azure VM
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
       - CD
 
 jobs:
-  debug:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -22,3 +22,25 @@ jobs:
     - name: Test SSH Connection
       run: |
         ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 "echo 'SSH connection successful'"
+
+    - name: Deploy Application
+      run: |
+        ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 << 'EOF'
+          # Navigate to the project directory
+          cd /home/azureuser/Backend || exit 1
+
+          # Pull the latest changes from the repository
+          git pull origin main || exit 1
+
+          # Activate the virtual environment
+          source venv/bin/activate || exit 1
+
+          # Install dependencies
+          pip install -r requirements.txt || exit 1
+
+          # Stop any running instance of the application
+          pkill -f 'uvicorn' || true
+
+          # Start the application
+          nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+        EOF
