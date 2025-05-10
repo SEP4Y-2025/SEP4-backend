@@ -30,7 +30,7 @@ jobs:
           cd /home/azureuser/Backend || exit 1
 
           # Pull the latest changes from the repository
-          git pull origin main || exit 1
+          git pull origin master || exit 1
 
           # Activate the virtual environment
           source venv/bin/activate || exit 1
