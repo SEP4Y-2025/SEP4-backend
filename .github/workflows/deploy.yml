@@ -1,4 +1,4 @@
-name: CD Pipeline
+name: Debug SSH Connection
 
 on:
   push:
@@ -6,18 +6,12 @@ on:
       - main
       - master
       - CD
-  pull_request:
-    branches:
-      - main
 
 jobs:
-  deploy:
+  debug:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
     - name: Set up SSH key
       run: |
         mkdir -p ~/.ssh
@@ -28,72 +22,3 @@ jobs:
     - name: Test SSH Connection
       run: |
         ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 "echo 'SSH connection successful'"
-
-    - name: SSH into VM and Deploy
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 << 'EOF'
-          cd /home/azureuser/Backend
-          
-          git pull origin main
-          
-          source venv/bin/activate
-          
-          pip install -r requirements.txt
-          
-          pkill -f 'uvicorn'
-
-          nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-        EOF
-
-    - name: Send deployment notification
-      run: |
-        echo "Deployment Successful!"name: CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-      - master
-      - CD
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 20.77.112.61 >> ~/.ssh/known_hosts
-
-    - name: Test SSH Connection
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 "echo 'SSH connection successful'"
-
-    - name: SSH into VM and Deploy
-      run: |
-        ssh -o StrictHostKeyChecking=no azureuser@20.77.112.61 << 'EOF'
-          cd /home/azureuser/Backend
-          
-          git pull origin main
-          
-          source venv/bin/activate
-          
-          pip install -r requirements.txt
-          
-          pkill -f 'uvicorn'
-
-          nohup uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-        EOF
-
-    - name: Send deployment notification
-      run: |
-        echo "Deployment Successful!"
