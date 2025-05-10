@@ -1,5 +1,6 @@
 from bson import ObjectId
-
+from datetime import datetime
+import json
 
 def some_utility_function(param1, param2):
     # Example utility function that performs a calculation
@@ -22,5 +23,11 @@ def convert_object_ids(obj):
     else:
         return obj
 
-
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super(JSONEncoder, self).default(obj)
 # Additional utility functions can be added here as needed.

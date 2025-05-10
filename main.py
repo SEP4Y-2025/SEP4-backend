@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.mqtt_client import mqtt_client
 from api.controllers.plant_pots_controller import router as pots_router
 from api.controllers.plant_types_controller import router as plant_types_router
+from api.controllers.environments_controller import router as environments_router
 
 app = FastAPI()
 
@@ -17,5 +18,5 @@ app.add_middleware(
 )
 app.include_router(pots_router)
 app.include_router(plant_types_router)
-
+app.include_router(environments_router)
 # mqtt_client.start()
