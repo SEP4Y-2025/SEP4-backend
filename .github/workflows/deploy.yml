@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - CD
   pull_request:
     branches:
       - main
