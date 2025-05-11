@@ -46,17 +46,26 @@ class RegisterRequest(BaseModel):
 
 @router.post("/auth/register")
 async def register(user_data: RegisterRequest):
-    auth_service = AuthService()
-    user_id = auth_service.create_user(
-        user_data.username, 
-        user_data.password, 
-        user_data.email
-    )
-
-    if not user_id:
-        raise HTTPException(
-            status_code=400,
-            detail="Username already exists"
+    try:
+        auth_service = AuthService()
+        user_id = auth_service.create_user(
+            user_data.username, 
+            user_data.password, 
+            user_data.email
         )
-
-    return {"message": "User created successfully", "user_id": user_id}
+        
+        if not user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Username already exists"
+            )
+        
+        return {"message": "User created successfully", "user_id": user_id}
+    except Exception as e:
+        import traceback
+        print(f"Registration error: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
