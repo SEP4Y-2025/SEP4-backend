@@ -7,8 +7,7 @@ from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
 from pymongo import MongoClient
 from repositories.sensor_readings_repository import SensorReadingsRepository
 from repositories.plant_pots_repository import PlantPotsRepository
-
-
+from repositories.arduinos_repository import ArduinosRepository
 
 # MongoDB Client Setup
 client = MongoClient(MONGO_URI)
@@ -22,6 +21,7 @@ class MQTTClient:
         self.client.on_message = self.on_message
         self.sensor_readings_repo = SensorReadingsRepository()
         self.plant_pots_repo = PlantPotsRepository()
+        self.arduinos_repo = ArduinosRepository()
 
     def handle_sensor_readings(self, data):
             timestamp = time.time()
@@ -65,33 +65,47 @@ class MQTTClient:
         print(f"Pots: {self.plant_pots_repo.find_pot_by_id(pot_id)}")
 
         if result.matched_count == 0:
-            print(f"Pot ID {pot_id} not updated")
+            #print(f"Pot ID {pot_id} not updated")
+            raise ValueError(f"Pot ID {pot_id} not found")
 
     def on_message(self, client, userdata, msg):
-        print(f"Received message on topic {msg.topic}")
-        
-        data = json.loads(msg.payload.decode())
-        print(f"Received message with {data}")
-        
-        if msg.topic and msg.topic.endswith("/sensors"):
-            self.handle_sensor_readings(data)
+        try:
+            print(f"Received message on topic {msg.topic}")
+            
+            data = json.loads(msg.payload.decode())
+            print(f"Received message with {data}")
+            
+            if msg.topic and msg.topic.endswith("/sensors"):
+                self.handle_sensor_readings(data)
 
+            if msg.topic and msg.topic.endswith("/data/ok"):
+                self.handle_get_pot_data(data)
 
-        # Find the appropriate queue based on response topic and put the message in the queue
-        if msg.topic and msg.topic in self.response_queues:
-             self.response_queues[msg.topic].put(data)
-             pending_requests_collection.delete_one({"response_topic": msg.topic})  # Remove from pending requests
-             
-        if msg.topic and msg.topic.endswith("/data/ok"):
-            self.handle_get_pot_data(data)
+            # Find the appropriate queue based on response topic and put the message in the queue
+            if msg.topic and msg.topic in self.response_queues:
+                self.response_queues[msg.topic].put(data)
+                pending_requests_collection.delete_one({"response_topic": msg.topic})  # Remove from pending requests
+        except Exception as e:
+            print(f"Exception while handling MQTT message: {type(e).__name__} - {e}")
+            if msg.topic in self.response_queues:
+                self.response_queues[msg.topic].put({"status": "error", "error": str(e)})
+
         
-        #return response_queue
+    def subscribe_to_all_topics(self):
+        pot_ids = self.arduinos_repo.get_all_arduinos()
+        
+        for arduino in pot_ids:
+            pot_id = arduino["_id"]
+            topic = f"/{pot_id}/sensors"
+            print(f"Subscribing to topic: {topic}")
+            self.client.subscribe(topic)
+        
+
     def start(self):
         parsed = urlparse(MQTT_BROKER_URL)
         self.client.connect(parsed.hostname or "mqtt", parsed.port or 1883)
         self.client.loop_start()
-        #############################################
-        self.client.subscribe("/pot_1/sensors")
+        self.subscribe_to_all_topics()
 
 
     def send(self, topic: str, payload:dict, timeout=20):
@@ -122,7 +136,7 @@ class MQTTClient:
                 if response.get("status") == "ok":
                     return response
                 else:
-                    print(f"Error in response: {response}")
+                    return {"error": response.get("error", "Unknown error")}
             except queue.Empty:
                 continue
             
