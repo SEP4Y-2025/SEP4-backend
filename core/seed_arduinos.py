@@ -2,6 +2,7 @@ from pymongo import MongoClient
 import os
 from bson import ObjectId
 from datetime import datetime
+from utils.password_hash import hash_password
 
 # MongoDB connection
 client = MongoClient(os.getenv("MONGO_URL", "mongodb://mongo:27017"))
@@ -9,6 +10,7 @@ db = client["sep_database"]
 collection = db["arduinos"]
 collectionEnv = db["environments"]
 collectionPlantTypes = db["plant_types"]
+collectionUsers = db["users"]
 
 # Initial Arduino data
 initial_arduinos = [
@@ -30,7 +32,8 @@ initial_envs = [
         "temperature": 20,
         "accessControl": [
             {
-                "userId": ObjectId("662ebf49c7b9e2a7681e4a53")
+                "userId": ObjectId("662ebf49c7b9e2a7681e4a53"),
+                "role": "Plant Owner"
             }
         ],
         "plantPots": [
@@ -108,6 +111,27 @@ plant_types = [
     }
 ]
 
+users = [
+    {
+        "_id": ObjectId("662ebf49c7b9e2a7681e4a53"),
+        "username": "Allan",
+        "password": hash_password("password1"),
+        "email": "email1@domain.com"
+    },
+    {
+        "_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
+        "username": "Bob",
+        "password": hash_password("password2"),
+        "email": "email2@domain.com"
+    },
+    {
+        "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
+        "username": "Charlie",
+        "password": hash_password("password3"),
+        "email": "email3@domain.com"
+    }
+]
+
 # Insert plant types
 for pt in plant_types:
     try:
@@ -131,3 +155,11 @@ for env in initial_envs:
         print(f"Inserted: {env['_id']}")
     except Exception as e:
         print(f"Skipping {env['_id']}: {e}")
+
+# Insert users
+for user in users:
+    try:
+        collectionUsers.insert_one(user)
+        print(f"Inserted: {user['_id']}")
+    except Exception as e:
+        print(f"Skipping {user['_id']}: {e}")
