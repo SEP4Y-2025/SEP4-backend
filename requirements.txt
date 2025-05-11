@@ -3,3 +3,5 @@ uvicorn
 pymongo
 paho-mqtt
 python-multipart
+pyjwt
+passlib[bcrypt]
