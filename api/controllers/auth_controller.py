@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
-from models.auth import TokenResponse, RegisterRequest
+from models.auth import TokenResponse, RegisterRequest, RegisterResponse
 from services.auth_service import AuthService
 from datetime import timedelta
 
@@ -39,28 +38,23 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-class RegisterRequest(BaseModel):
-    username: str
-    password: str
-    email: str = None
 
-@router.post("/auth/register")
+@router.post("/auth/register", response_model=RegisterResponse)
 async def register(user_data: RegisterRequest):
     try:
         auth_service = AuthService()
-        user_id = auth_service.create_user(
-            user_data.username, 
-            user_data.password, 
-            user_data.email
+        result = auth_service.create_user(
+            name=user_data.name, 
+            username=user_data.username, 
+            password=user_data.password,
+            email=user_data.email
         )
-        
-        if not user_id:
+        if not result:
             raise HTTPException(
                 status_code=400,
                 detail="Username already exists"
             )
-        
-        return {"message": "User created successfully", "user_id": user_id}
+        return RegisterResponse(**result)
     except Exception as e:
         import traceback
         print(f"Registration error: {str(e)}")
