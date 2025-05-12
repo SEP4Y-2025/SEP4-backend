@@ -83,5 +83,5 @@ class AuthService:
             return False
         if not self.verify_password(old_password, user["password"]):
             return False
-        new_hased = self.get_password_hash(new_password)
-        return self.auth_repository.update_user_password(username, new_hased)
+        new_hashed = self.get_password_hash(new_password)
+        return self.auth_repository.update_user_password(username, new_hashed)
