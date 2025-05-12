@@ -3,6 +3,8 @@ from typing import Optional
 import jwt
 from passlib.context import CryptContext
 from repositories.auth_repository import AuthRepository
+import bcrypt
+from utils.password_hash import hash_password
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -73,3 +75,13 @@ class AuthService:
             print(f"Error creating user: {str(e)}")
             print(traceback.format_exc())
             return None
+        
+    def change_password(self, username: str, old_password: str, new_password: str):
+        user = self.auth_repository.find_user_by_username(username)
+        if not user:
+            print(f"User {username} not found")
+            return False
+        if not self.verify_password(old_password, user["password"]):
+            return False
+        new_hased = self.get_password_hash(new_password)
+        return self.auth_repository.update_user_password(username, new_hased)

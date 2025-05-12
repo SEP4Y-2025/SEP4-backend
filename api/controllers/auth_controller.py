@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from models.auth import TokenResponse, RegisterRequest
+from models.auth import TokenResponse, RegisterRequest, ChangePasswordRequest
 from services.auth_service import AuthService
 from datetime import timedelta
 
@@ -64,6 +64,30 @@ async def register(user_data: RegisterRequest):
     except Exception as e:
         import traceback
         print(f"Registration error: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
+    
+@router.post("/auth/change-password")
+async def change_password(data: ChangePasswordRequest):
+    try:
+        auth_service = AuthService()
+        success = auth_service.change_password(
+            data.username, 
+            data.old_password, 
+            data.new_password
+        )
+        if not success:
+            raise HTTPException(
+                status_code=400,
+                detail="Failed to change password"
+            )
+        return {"message": "Password changed successfully"}
+    except Exception as e:
+        import traceback
+        print(f"Change password error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(
             status_code=500,

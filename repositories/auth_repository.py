@@ -52,3 +52,13 @@ class AuthRepository:
             print(f"Error inserting user: {str(e)}")
             print(traceback.format_exc())
             return None
+    def update_user_password(self, username, new_password: str):
+        try:
+            result = self.collection.update_one(
+                {"username": username},
+                {"$set": {"password": new_password}}
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            print(f"Error updating password for user {username}: {str(e)}")
+            return False
