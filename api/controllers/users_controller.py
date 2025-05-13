@@ -19,3 +19,19 @@ def add_user_permission(environment_id: str, user_permission: AddUserPermissionR
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/users/{user_id}/environments")
+def get_user_environments(user_id: str):
+    try:
+        service = UsersService()
+        environments = service.get_user_environments(user_id)
+
+        return JSONResponse(
+            status_code=200,
+            content={"environments": environments}
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

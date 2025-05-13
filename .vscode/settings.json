@@ -59,5 +59,10 @@
   "files.associations": {
     "string.h": "c",
     "stdio.h": "c"
-  }
+  },
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

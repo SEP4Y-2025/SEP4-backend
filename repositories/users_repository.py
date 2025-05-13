@@ -29,3 +29,17 @@ class UsersRepository:
         except Exception as e:
             print(f"Error adding permission: {e}")
             return False
+    
+    def get_user_environment_ids(self, user_id: str):
+        try:
+            user = self.user_collection.find_one({"_id": ObjectId(user_id)})
+            if not user:
+                raise ValueError("User not found")
+
+            return user.get("environments", [])
+        except Exception as e:
+            print(f"Error fetching environment IDs: {e}")
+            raise
+
+        
+    
