@@ -23,7 +23,6 @@ class MQTTClient:
         self.plant_pots_repo = PlantPotsRepository()
         self.arduinos_repo = ArduinosRepository()
 
-    def handle_sensor_readings(self, data):
 
     def on_message(self, client, userdata, msg):
         print(f"Received message on topic {msg.topic}")
@@ -126,12 +125,12 @@ class MQTTClient:
             self.client.subscribe(topic)
         
 
-        # Find the appropriate queue based on response topic and put the message in the queue
-        if msg.topic and msg.topic in self.response_queues:
-            self.response_queues[msg.topic].put(data)
-            pending_requests_collection.delete_one(
-                {"response_topic": msg.topic}
-            )  # Remove from pending requests
+        # # Find the appropriate queue based on response topic and put the message in the queue
+        # if msg.topic and msg.topic in self.response_queues:
+        #     self.response_queues[msg.topic].put(data)
+        #     pending_requests_collection.delete_one(
+        #         {"response_topic": msg.topic}
+        #     )  # Remove from pending requests
 
     def start(self):
         parsed = urlparse(MQTT_BROKER_URL)

@@ -51,7 +51,7 @@ class PlantPotsRepository:
         try:
             env_obj_id = ObjectId(environment_id)
             environment = self.env_collection.find_one({"_id": env_obj_id})
-            pots = environment.get("plantPots", [])
+            pots = environment.get("plant_pots", [])
             return convert_object_ids(pots)
         except Exception as e:
             import traceback
