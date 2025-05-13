@@ -3,13 +3,14 @@ from core.config import MONGO_URI, DB_NAME
 from utils.helper import convert_object_ids
 from bson import ObjectId
 
+
 class PlantTypesRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
-        self.env_collection = self.db["environments"]      # for environments
+        self.env_collection = self.db["environments"]  # for environments
         self.plant_type_collection = self.db["plant_types"]  # for plant types
-        
+
     def get_plant_type_by_id(self, plant_type_id: str):
         return self.plant_type_collection.find_one({"_id": ObjectId(plant_type_id)})
 
@@ -27,7 +28,9 @@ class PlantTypesRepository:
         try:
             env_obj_id = ObjectId(environment_id)
 
-            plant_types = list(self.plant_type_collection.find({"plant_env_id": env_obj_id}))
+            plant_types = list(
+                self.plant_type_collection.find({"plant_env_id": env_obj_id})
+            )
 
             if not plant_types:
                 print(f"No plant types found for environment ID {environment_id}.")
@@ -37,6 +40,7 @@ class PlantTypesRepository:
 
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             print(f"Error fetching plant types by environment: {e}")
             return []
@@ -49,4 +53,3 @@ class PlantTypesRepository:
         except Exception as e:
             print(f"Error inserting plant type: {e}")
             return None
-

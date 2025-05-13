@@ -2,12 +2,13 @@
 from pymongo import MongoClient
 from core.config import MONGO_URI, DB_NAME
 
+
 class MongoRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
 
-    def get_collection(self, name:str):
+    def get_collection(self, name: str):
         return self.db[name]
 
     def insert_one(self, collection_name: str, document: dict):
@@ -19,5 +20,3 @@ class MongoRepository:
 
     def update_one(self, collection_name: str, query: dict, update: dict):
         return self.get_collection(collection_name).update_one(query, update)
-    
-    

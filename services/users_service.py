@@ -19,7 +19,7 @@ class UsersService:
             raise ValueError("Invalid user data: 'user_email' is required")
 
         return self.repository.add_permission(environment_id, user)
-    
+   
     def get_user_environments(self, user_id: str):
         env_ids = self.repository.get_user_environment_ids(user_id)
 
@@ -38,3 +38,13 @@ class UsersService:
                 continue
 
         return environments
+    def get_user(self, user_id: str):
+        if not user_id:
+            raise ValueError("Invalid user ID: 'user_id' is required")
+        
+        user = self.repository.get_user(user_id)
+        
+        if not user:
+            raise ValueError("User not found")
+        
+        return user

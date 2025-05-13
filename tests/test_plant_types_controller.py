@@ -37,11 +37,21 @@ def test_add_plant_type_missing_data(client):
         "water_dosage": 100
     }
 
-    with patch("services.plant_types_service.PlantTypesService.add_plant_type") as mock_service:
-        mock_service.side_effect = ValueError("Invalid plant type data: 'name' and 'plant_env_id' are required")
-        response = client.post("/environments/env_1/plant_types", json=payload)
-        assert response.status_code == 400
-        assert "Invalid plant type data" in response.json()["detail"]
+    response = client.post("/environments/env_1/plant_types", json=payload)
+    assert response.status_code == 422
+    assert response.json() == {
+        "detail": [
+            {
+                "type": "missing",
+                "loc": ["body", "name"],
+                "msg": "Field required",
+                "input": {
+                    "water_frequency": 7,
+                    "water_dosage": 100
+                }
+            }
+        ]
+    }
 
 
 def test_get_plant_types_success(client):
