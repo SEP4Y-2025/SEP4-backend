@@ -19,7 +19,8 @@ initial_arduinos = [
     {"_id": "pot_3", "active": False},
     {"_id": "pot_4", "active": False},
     {"_id": "pot_5", "active": False},
-    {"_id": "pot_6", "active": False}
+    {"_id": "pot_6", "active": False},
+    {"_id": "662ebf49c7b9e2a7681e4a54", "active": False}
 ]
 
 # Initial environment data
@@ -27,59 +28,51 @@ initial_envs = [
     {
         "_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Greenhouse #1",
-        "ownerId": ObjectId("662ebf49c7b9e2a7681e4a53"),
-        "windowState": "closed",
-        "temperature": 20,
-        "accessControl": [
-            {
-                "userId": ObjectId("662ebf49c7b9e2a7681e4a53"),
-                "role": "Plant Owner"
-            }
+        "owner_id": ObjectId("662ebf49c7b9e2a7681e4a53"),
+        "window_state": "closed",
+        "access_control": [
         ],
-        "plantPots": [
+        "plant_pots": [
             {
-                "potId": ObjectId("662ebf49c7b9e2a7681e4a54"),
+                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
                 "name": "pot1",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "state": {
-                    "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
-                    "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 20]
-                },
-                "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a55"),
-                "waterTank": {
-                    "capacityMl": 1000,
-                    "currentLevelMl": 750,
-                    "status": "active"
+                    "air_humidity": 30,
+                    "temperature": 20,
+                    "soil_humidity": 20,
+                    "light_intensity": 50,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
                 }
             },
             {
-                "potId": ObjectId("662ebf49c7b9e2a7681e4a56"),
+                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a56"),
                 "name": "pot2",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "state": {
-                    "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
-                    "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 24]
-                },
-                "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a55"),
-                "waterTank": {
-                    "capacityMl": 1000,
-                    "currentLevelMl": 500,
-                    "status": "active"
+                    "air_humidity": 10,
+                    "temperature": 22,
+                    "soil_humidity": 30,
+                    "light_intensity": 40,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
                 }
             },
             {
-                "potId": ObjectId("662ebf49c7b9e2a7681e4a57"),
+                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a57"),
                 "name": "pot3",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a58"),
                 "state": {
-                    "airHumidity": [datetime(2025, 4, 29, 12, 0, 0), 30],
-                    "temperature": [datetime(2025, 4, 29, 12, 0, 0), 20],
-                    "soilHumidity": [datetime(2025, 4, 29, 12, 0, 0), 18]
-                },
-                "plantTypeId": ObjectId("662ebf49c7b9e2a7681e4a58"),
-                "waterTank": {
-                    "capacityMl": 1000,
-                    "currentLevelMl": 900,
-                    "status": "active"
+                    "air_humidity": 20,
+                    "temperature": 17,
+                    "soil_humidity": 10,
+                    "light_intensity": 10,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
                 }
             }
         ]
@@ -90,24 +83,24 @@ initial_envs = [
 plant_types = [
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
-        "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Rose",
+        "watering_frequency": 2,
         "water_dosage": 50,
-        "water_frequency": 2
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a58"),
-        "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Tulip",
+        "watering_frequency": 3,
         "water_dosage": 40,
-        "water_frequency": 3
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a59"),
-        "plant_env_id": ObjectId("680f8359688cb5341f9f9c19"),
         "name": "Sunflower",
+        "watering_frequency": 1,
         "water_dosage": 60,
-        "water_frequency": 1
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
     }
 ]
 
@@ -116,21 +109,30 @@ users = [
         "_id": ObjectId("662ebf49c7b9e2a7681e4a53"),
         "username": "Allan",
         "password": hash_password("password1"),
-        "email": "email1@domain.com"
+        "email": "email1@domain.com",
+        "environments": [
+            {
+                "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
+                "role": "Owner"
+            }
+        ]
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
         "username": "Bob",
         "password": hash_password("password2"),
-        "email": "email2@domain.com"
+        "email": "email2@domain.com",
+        "environments": []
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
         "username": "Charlie",
         "password": hash_password("password3"),
-        "email": "email3@domain.com"
+        "email": "email3@domain.com",
+        "environments": []
     }
 ]
+
 
 # Insert plant types
 for pt in plant_types:
