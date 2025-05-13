@@ -24,3 +24,8 @@ class EnvironmentsRepository:
             traceback.print_exc()
             print(f"Error fetching environments: {e}")
             return []
+    
+    def get_environment_by_id(self, environment_id: str):
+       env = self.collection.find_one({"_id": ObjectId(environment_id)})   
+       return env if env else None
+        

@@ -32,3 +32,28 @@ def get_environments():
             status_code=500,
             content={"message": f"Internal server error: {str(e)}"}
         )
+
+@router.get("/environments/{environment_id}", response_class=JSONResponse)
+def get_environment_by_id(environment_id: str):
+    print(f"Received environment ID: {environment_id}")
+    try:
+        service = EnvironmentsService()
+        environment = service.get_environment_by_id(environment_id)
+
+        if environment:
+            return JSONResponse(
+                status_code=200,
+                content=environment
+            )
+        else:
+            return JSONResponse(
+                status_code=404,
+                content={"message": "Environment not found"}
+            )
+    except Exception as e:
+        print(f"Error: {e}")
+        return JSONResponse(
+            status_code=500,
+            content={"message": "Internal Server Error"}
+        )
+
