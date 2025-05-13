@@ -14,6 +14,30 @@ class UsersRepository:
         user = self.user_collection.find_one({"email": user["user_email"]})
         if not user:
             raise ValueError("Invalid user data: 'user_email' is required")
+            user_id = str(user["_id"])
+            result = self.env_collection.update_one(
+                {"_id": ObjectId(environment_id)},
+                {"$addToSet": {"accessControl": {"userId": ObjectId(user_id),
+                                                 "role": "Plant Assistant"}}}
+            )
+            if result.modified_count == 0:
+                raise ValueError(f"No environment found with ID {environment_id}")
+            else:
+                return True
+        except Exception as e:
+            print(f"Error adding permission: {e}")
+            return False
+    
+    def get_user_environment_ids(self, user_id: str):
+        try:
+            user = self.user_collection.find_one({"_id": ObjectId(user_id)})
+            if not user:
+                raise ValueError("User not found")
+
+            return user.get("environments", [])
+        except Exception as e:
+            print(f"Error fetching environment IDs: {e}")
+            raise
 
         user_id = str(user["_id"])
         env = self.env_collection.find_one({"_id": ObjectId(environment_id)})

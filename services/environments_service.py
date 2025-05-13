@@ -8,3 +8,6 @@ class EnvironmentsService:
         result = self.environments_repository.get_environments()
         print(f"Environments service returned {len(result) if result else 0} environments")
         return result
+    
+    def get_environment_by_id(self, environment_id: str):
+        return self.environments_repository.get_environment_by_id(environment_id)
