@@ -4,6 +4,7 @@ import os
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+
 def setup_logging():
     logging.basicConfig(level=LOG_LEVEL, format=LOG_FORMAT)
     logger = logging.getLogger(__name__)
@@ -17,5 +18,6 @@ def setup_logging():
     logger.addHandler(file_handler)
 
     return logger
+
 
 logger = setup_logging()

@@ -4,7 +4,7 @@ from models.plant_pot import AddPlantPotRequest, AddPlantPotResponse, GetPlantPo
 from repositories.plant_pots_repository import PlantPotsRepository
 from repositories.arduinos_repository import ArduinosRepository
 from repositories.plant_types_repository import PlantTypesRepository
-from repositories.sensor_readings_repository import SensorReadingsRepository 
+from repositories.sensor_readings_repository import SensorReadingsRepository
 from core.mqtt_client import mqtt_client
 import json, time, uuid, queue
 import datetime
@@ -22,7 +22,7 @@ class PlantPotsService:
             raise ValueError("Unknown or unregistered Arduino")
 
         print("Registered pot - good\n")
-        
+
         # Get full plant type details from DB
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot.plant_type_id)
         if not plant_type:
@@ -33,9 +33,9 @@ class PlantPotsService:
             "watering_frequency": plant_type["watering_frequency"],
             "water_dosage": plant_type["water_dosage"]
         }
-        
+
         print("Sending command to MQTT broker:", payload)
-        
+
         result = mqtt_client.send(f"/{pot.pot_id}/activate", payload)
 
         if result.get("error"):
@@ -62,7 +62,7 @@ class PlantPotsService:
             "water_level_percentage": 0,
             "measured_at": formatted_time
         }
-        
+
         self.plant_pots_repo.insert_pot(pot_doc)
         self.arduinos_repo.mark_active(pot.pot_id)
 
@@ -74,7 +74,7 @@ class PlantPotsService:
             plant_type_name=plant_type["plant_type_name"],
             watering_frequency=plant_type["watering_frequency"],
             water_dosage=plant_type["water_dosage"],
-            environment_id=pot_doc["environment_id"]
+            environment_id=pot_doc["environment_id"],
         )
 
     def get_plant_pot_by_id(self, env_id : str, pot_id: str) -> GetPlantPotResponse:
@@ -112,7 +112,7 @@ class PlantPotsService:
             
     def get_pots_by_environment(self, environment_id: str):
         return self.plant_pots_repo.get_pots_by_environment(environment_id)
-    
+
     def delete_plant_pot(self, pot_id: str) -> bool:
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
@@ -130,7 +130,7 @@ class PlantPotsService:
 
         if result.get("error"):
             raise ValueError(result["error"])
-        
+
         # Delete sensor readings related to this pot from the sensor_readings collection
         deleted_count = self.sensor_readings_repo.delete_by_pot(pot_id)
         print(f"Deleted {deleted_count} sensor readings associated with pot {pot_id}")
@@ -140,4 +140,3 @@ class PlantPotsService:
         self.arduinos_repo.mark_inactive(pot_id)
 
         return True
-        

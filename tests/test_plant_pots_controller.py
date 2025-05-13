@@ -1,12 +1,14 @@
+from unittest.mock import patch
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from unittest.mock import patch
 
 from api.controllers.plant_pots_controller import router as pot_router
 
 app = FastAPI()
 app.include_router(pot_router)
+
 
 @pytest.fixture
 def client():
@@ -22,7 +24,7 @@ def test_add_plant_pot_success(client):
         "plant_type_name": "mint",
         "watering_frequency": 3,
         "water_dosage": 300,
-        "environment_id": "1"
+        "environment_id": "1",
     }
 
     payload = {
@@ -30,10 +32,13 @@ def test_add_plant_pot_success(client):
         "plant_pot_label": "green pot",
         "plant_type_id": "67fce650e50105831f316bff",
         "watering_frequency": 3,
-        "water_dosage": 300
+        "water_dosage": 300,
     }
 
-    with patch("services.plant_pots_service.PlantPotsService.add_plant_pot", return_value=mock_response):
+    with patch(
+        "services.plant_pots_service.PlantPotsService.add_plant_pot",
+        return_value=mock_response,
+    ):
         response = client.post("/environments/1/pots", json=payload)
         assert response.status_code == 200
         assert response.json() == mock_response
@@ -44,11 +49,12 @@ def test_add_pot_missing_field(client):
         "plant_pot_label": "green pot",
         "plant_type_id": "67fce650e50105831f316bff",
         "watering_frequency": 3,
-        "water_dosage": 300
+        "water_dosage": 300,
         # Missing "pot_id"
     }
     response = client.post("/environments/1/pots", json=payload)
     assert response.status_code == 422
+
 
 
 def test_get_plant_pot_success(client):
@@ -61,13 +67,16 @@ def test_get_plant_pot_success(client):
         "plant_type_id": "456gh"
     }
 
-    with patch("services.plant_pots_service.PlantPotsService.get_plant_pot_by_id", return_value=mock_pot):
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
+        return_value=mock_pot,
+    ):
         response = client.get("/environments/234ab/pots/60f6f48e8d3f5b001f0e4d2b")
         assert response.status_code == 200
-        assert response.json() == mock_pot
+        assert response.json() == {"pot": mock_pot}
 
 def test_get_plant_pot_not_found(client):
-    environment_id = "680f8359688cb5341f9f9c19"
+    environment_id = "234ab"
     non_existent_pot_id = "nonexistentpotid"
 
     with patch("services.plant_pots_service.PlantPotsService.get_plant_pot_by_id", return_value=None):

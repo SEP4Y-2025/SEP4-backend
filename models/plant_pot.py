@@ -1,4 +1,4 @@
-#models/pot.py
+# models/pot.py
 
 from pydantic import BaseModel
 from datetime import datetime
@@ -17,6 +17,7 @@ class AddPlantPotResponse(BaseModel):
     watering_frequency: int
     water_dosage: int
     environment_id: str
+
 
 class GetPlantPotResponse(BaseModel):
     pot_id: str
