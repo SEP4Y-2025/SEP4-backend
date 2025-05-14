@@ -9,3 +9,11 @@ class AddUserPermissionRequest(BaseModel):
 
 class AddUserPermissionResponse(BaseModel):
     message: str
+
+
+class DeleteUserPermissionResponse(BaseModel):
+    message: str
+
+
+class DeleteUserPermissionRequest(BaseModel):
+    user_email: str

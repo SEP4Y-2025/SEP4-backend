@@ -1,6 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from models.user import AddUserPermissionRequest, AddUserPermissionResponse
+from models.user import (
+    AddUserPermissionRequest,
+    AddUserPermissionResponse,
+    DeleteUserPermissionRequest,
+    DeleteUserPermissionResponse,
+)
 from services.users_service import UsersService
 from bson import ObjectId
 from core.config import MONGO_URI
@@ -46,6 +51,25 @@ def get_user(user_id: str):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete(
+    "/environments/{environment_id}/assistants",
+    response_model=DeleteUserPermissionResponse,
+)
+def delete_user_permission(
+    environment_id: str, user_permission: DeleteUserPermissionRequest
+):
+    try:
+        service = UsersService()
+        service.delete_permission(environment_id, user_permission.dict())
+        return JSONResponse(
+            status_code=200, content={"message": "User permission deleted successfully"}
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
