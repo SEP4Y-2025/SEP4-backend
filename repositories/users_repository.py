@@ -23,7 +23,7 @@ class UsersRepository:
                 {
                     "$addToSet": {
                         "accessControl": {
-                            "userId": user_id,
+                            "user_id": user_id,
                             "role": "Plant Assistant",
                         }
                     }
@@ -51,21 +51,22 @@ class UsersRepository:
     def get_user_environment_ids(self, user_id: str):
         try:
             user = self.user_collection.find_one(
-                {"_id": ObjectId(user_id)}, {"environments.environment_id": 1}
+                {"_id": ObjectId(user_id)},
+                {"environments.environment_id": 1, "environments.role": 1},
             )
             if not user:
                 raise ValueError("User not found")
 
             environments = user.get("environments", [])
-            environment_ids = [
-                str(env["environment_id"])
+            environment_data = [
+                {"environment_id": str(env["environment_id"]), "role": env["role"]}
                 for env in environments
-                if "environment_id" in env
+                if "environment_id" in env and "role" in env
             ]
 
-            return environment_ids
+            return environment_data
         except Exception as e:
-            print(f"Error fetching environment IDs: {e}")
+            print(f"Error fetching environment data: {e}")
             raise
 
     def get_user(self, user_id: str):

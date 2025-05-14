@@ -42,12 +42,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-class RegisterRequest(BaseModel):
-    username: str
-    password: str
-    email: str = None
-
-
 @router.post("/auth/register")
 async def register(user_data: RegisterRequest):
     try:
