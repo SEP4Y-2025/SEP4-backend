@@ -23,4 +23,14 @@ app.include_router(plant_types_router)
 app.include_router(user_router)
 app.include_router(environments_router)
 app.include_router(auth_router)
-# mqtt_client.start()
+
+
+@app.on_event("startup")
+def on_startup():
+    # now envs are loaded, DB is ready, etc.
+    print("Starting MQTT client…")
+    mqtt_client.start()
+
+
+
+

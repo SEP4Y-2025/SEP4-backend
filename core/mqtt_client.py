@@ -187,4 +187,4 @@ class MQTTClient:
 
 
 mqtt_client = MQTTClient()
-mqtt_client.start()
+# mqtt_client.start()
