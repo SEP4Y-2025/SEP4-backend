@@ -23,7 +23,7 @@ class UsersRepository:
                 {
                     "$addToSet": {
                         "accessControl": {
-                            "userId": user_id,
+                            "user_id": user_id,
                             "role": "Plant Assistant",
                         }
                     }
