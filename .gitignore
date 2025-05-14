@@ -1,11 +1,10 @@
 # Python environment
-backend/__pycache__/
-backend/venv/
-backend/.env
 **/__pycache__/
 **/*.pyc
 **/*.pyo
 **/*.pyd
+.env
+venv/
 
 # Docker files
 docker/*.log

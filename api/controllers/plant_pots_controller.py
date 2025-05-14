@@ -52,7 +52,7 @@ def get_plant_pot(environment_id: str, pot_id: str):
             raise HTTPException(status_code=408, detail=str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/environments/{environment_id}/pots")
