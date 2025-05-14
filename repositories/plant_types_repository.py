@@ -29,7 +29,7 @@ class PlantTypesRepository:
             env_obj_id = ObjectId(environment_id)
 
             plant_types = list(
-                self.plant_type_collection.find({"plant_env_id": env_obj_id})
+                self.plant_type_collection.find({"environment_id": env_obj_id})
             )
 
             if not plant_types:
@@ -47,7 +47,7 @@ class PlantTypesRepository:
 
     def post_plant_type(self, plant_type: dict):
         try:
-            plant_type["plant_env_id"] = ObjectId(plant_type["plant_env_id"])
+            plant_type["environment_id"] = ObjectId(plant_type["environment_id"])
             result = self.plant_type_collection.insert_one(plant_type)
             return str(result.inserted_id)
         except Exception as e:
