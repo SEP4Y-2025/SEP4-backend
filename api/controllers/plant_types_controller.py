@@ -36,7 +36,7 @@ def add_plant_type(environment_id: str, plant_type: AddPlantTypeRequest):
     try:
         service = PlantTypesService()
         plant_type_data = plant_type.dict()
-        plant_type_data["plant_env_id"] = environment_id
+        plant_type_data["environment_id"] = environment_id
         plant_type_id = service.add_plant_type(plant_type_data)
         return AddPlantTypeResponse(
             message="Plant type added successfully", plantTypeId=plant_type_id
