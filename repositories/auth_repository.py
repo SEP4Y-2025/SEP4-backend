@@ -41,9 +41,10 @@ class AuthRepository:
     def find_user_by_id(self, user_id: str):
         try:
             return self.collection.find_one({"_id": ObjectId(user_id)})
-        except:
-            print(f"Error finding user by ID: {user_id}")
+        except Exception as e:
+            print(f"Error fetching user by ID: {str(e)}")
             return None
+
 
     def create_user(self, user_data: dict):
         try:
