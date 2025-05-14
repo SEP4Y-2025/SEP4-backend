@@ -30,7 +30,3 @@ def on_startup():
     # now envs are loaded, DB is ready, etc.
     print("Starting MQTT client…")
     mqtt_client.start()
-
-
-
-

@@ -3,8 +3,6 @@ from typing import Optional
 import jwt
 from passlib.context import CryptContext
 from repositories.auth_repository import AuthRepository
-import bcrypt
-from utils.password_hash import hash_password
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

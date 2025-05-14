@@ -82,7 +82,9 @@ class UsersRepository:
 
     def delete_permission(self, environment_id: str, user: dict):
         if not user.get("user_email"):
-            raise ValueError("Invalid input: 'environment_id' and 'user_id' are required")
+            raise ValueError(
+                "Invalid input: 'environment_id' and 'user_id' are required"
+            )
         try:
             user = self.user_collection.find_one({"email": user["user_email"]})
             if not user:
