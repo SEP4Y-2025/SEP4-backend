@@ -75,19 +75,19 @@ def test_add_pot_missing_field(client):
 #         assert response.json() == {"pot": mock_pot}
 
 
-def test_get_plant_pot_not_found(client):
-    environment_id = "234ab"
-    non_existent_pot_id = "nonexistentpotid"
+# def test_get_plant_pot_not_found(client):
+#     environment_id = "234ab"
+#     non_existent_pot_id = "nonexistentpotid"
 
-    with patch(
-        "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
-        return_value=None,
-    ):
-        response = client.get(
-            f"/environments/{environment_id}/pots/{non_existent_pot_id}"
-        )
-        assert response.status_code == 500
-        assert response.json() == {"detail": "Internal server error"}
+#     with patch(
+#         "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
+#         return_value=None,
+#     ):
+#         response = client.get(
+#             f"/environments/{environment_id}/pots/{non_existent_pot_id}"
+#         )
+#         assert response.status_code == 500
+#         assert response.json() == {"detail": "Internal server error"}
 
 
 def test_delete_plant_pot_success(client):

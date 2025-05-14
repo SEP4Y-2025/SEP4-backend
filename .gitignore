@@ -8,3 +8,4 @@ venv/
 
 # Docker files
 docker/*.log
+*.pyc
