@@ -7,7 +7,7 @@ from api.controllers.plant_pots_controller import router as pots_router
 from api.controllers.plant_types_controller import router as plant_types_router
 from api.controllers.users_controller import router as user_router
 from api.controllers.environments_controller import router as environments_router
-from api.controllers.auth_controller import router as auth_router 
+from api.controllers.auth_controller import router as auth_router
 
 app = FastAPI()
 
@@ -23,8 +23,4 @@ app.include_router(plant_types_router)
 app.include_router(user_router)
 app.include_router(environments_router)
 app.include_router(auth_router)
-#mqtt_client.start()
-
-
-
-
+# mqtt_client.start()

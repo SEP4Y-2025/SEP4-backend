@@ -17,6 +17,6 @@ class ArduinosRepository:
 
     def mark_inactive(self, pot_id: str):
         return self.collection.update_one({"_id": pot_id}, {"$set": {"active": False}})
-    
+
     def get_all_arduinos(self):
         return list(self.collection.find({}))

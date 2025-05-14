@@ -3,11 +3,13 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+
 class AddPlantPotRequest(BaseModel):
     plant_pot_label: str
     pot_id: str
     plant_type_id: str
-    
+
+
 class AddPlantPotResponse(BaseModel):
     message: str
     pot_id: str
@@ -34,4 +36,3 @@ class GetPlantPotResponse(BaseModel):
     water_tank_capacity_ml: int
     water_level_percentage: int
     measured_at: datetime
-    

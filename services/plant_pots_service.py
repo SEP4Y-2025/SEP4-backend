@@ -1,6 +1,10 @@
 # service/pots_service.py
 
-from models.plant_pot import AddPlantPotRequest, AddPlantPotResponse, GetPlantPotResponse
+from models.plant_pot import (
+    AddPlantPotRequest,
+    AddPlantPotResponse,
+    GetPlantPotResponse,
+)
 from repositories.plant_pots_repository import PlantPotsRepository
 from repositories.arduinos_repository import ArduinosRepository
 from repositories.plant_types_repository import PlantTypesRepository
@@ -17,7 +21,9 @@ class PlantPotsService:
         self.plant_types_repo = PlantTypesRepository()
         self.sensor_readings_repo = SensorReadingsRepository()
 
-    def add_plant_pot(self, environment_id : str, pot: AddPlantPotRequest) -> AddPlantPotResponse:
+    def add_plant_pot(
+        self, environment_id: str, pot: AddPlantPotRequest
+    ) -> AddPlantPotResponse:
         if not self.arduinos_repo.is_registered(pot.pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 
@@ -31,7 +37,7 @@ class PlantPotsService:
         # Send MQTT command to hardware
         payload = {
             "watering_frequency": plant_type["watering_frequency"],
-            "water_dosage": plant_type["water_dosage"]
+            "water_dosage": plant_type["water_dosage"],
         }
 
         print("Sending command to MQTT broker:", payload)
@@ -40,13 +46,13 @@ class PlantPotsService:
 
         if result.get("error"):
             raise ValueError(result["error"])
-        
+
         timestamp = time.time()
         dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
-            
-            # (ISO 8601)
-        formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
-            # Extract the sensor data from the message
+
+        # (ISO 8601)
+        formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+        # Extract the sensor data from the message
 
         # Store in DB
         pot_doc = {
@@ -60,7 +66,7 @@ class PlantPotsService:
             "light_intensity_lux": 0,
             "water_tank_capacity_ml": 0,
             "water_level_percentage": 0,
-            "measured_at": formatted_time
+            "measured_at": formatted_time,
         }
 
         self.plant_pots_repo.insert_pot(pot_doc)
@@ -77,19 +83,19 @@ class PlantPotsService:
             environment_id=pot_doc["environment_id"],
         )
 
-    def get_plant_pot_by_id(self, env_id : str, pot_id: str) -> GetPlantPotResponse:
+    def get_plant_pot_by_id(self, env_id: str, pot_id: str) -> GetPlantPotResponse:
         payload = {}
         result = mqtt_client.send(f"/{pot_id}/data", payload)
 
         if result.get("error"):
             raise ValueError(result["error"])
-        
+
         pot = self.plant_pots_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
-        
+
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
-        
+
         if not plant_type:
             raise ValueError("Invalid plant type ID")
 
@@ -107,9 +113,9 @@ class PlantPotsService:
             light_intensity_lux=pot["light_intensity_lux"],
             water_tank_capacity_ml=pot["water_tank_capacity_ml"],
             water_level_percentage=pot["water_level_percentage"],
-            measured_at=pot["measured_at"]
+            measured_at=pot["measured_at"],
         )
-            
+
     def get_pots_by_environment(self, environment_id: str):
         return self.plant_pots_repo.get_pots_by_environment(environment_id)
 

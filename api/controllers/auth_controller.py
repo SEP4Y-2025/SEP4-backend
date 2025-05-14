@@ -8,6 +8,7 @@ from datetime import timedelta
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+
 @router.post("/auth/login", response_model=TokenResponse)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     try:
@@ -24,72 +25,62 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         access_token_expires = timedelta(minutes=30)
         token_data = auth_service.create_access_token(
             data={"sub": user["username"], "id": str(user["_id"])},
-            expires_delta=access_token_expires
+            expires_delta=access_token_expires,
         )
 
         return TokenResponse(
             access_token=token_data["access_token"],
             token_type=token_data["token_type"],
             expires_in=token_data["expires_in"],
-            user_id=str(user["_id"])
+            user_id=str(user["_id"]),
         )
     except Exception as e:
         import traceback
+
         print(f"Login error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
 
 class RegisterRequest(BaseModel):
     username: str
     password: str
     email: str = None
 
+
 @router.post("/auth/register")
 async def register(user_data: RegisterRequest):
     try:
         auth_service = AuthService()
         user_id = auth_service.create_user(
-            user_data.username, 
-            user_data.password, 
-            user_data.email
+            user_data.username, user_data.password, user_data.email
         )
-        
+
         if not user_id:
-            raise HTTPException(
-                status_code=400,
-                detail="Username already exists"
-            )
-        
+            raise HTTPException(status_code=400, detail="Username already exists")
+
         return {"message": "User created successfully", "user_id": user_id}
     except Exception as e:
         import traceback
+
         print(f"Registration error: {str(e)}")
         print(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
-    
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
 @router.post("/auth/change-password")
 async def change_password(data: ChangePasswordRequest):
     try:
         auth_service = AuthService()
         success = auth_service.change_password(
-            data.username, 
-            data.old_password, 
-            data.new_password
+            data.username, data.old_password, data.new_password
         )
         if not success:
-            raise HTTPException(
-                status_code=400,
-                detail="Failed to change password"
-            )
+            raise HTTPException(status_code=400, detail="Failed to change password")
         return {"message": "Password changed successfully"}
     except Exception as e:
         import traceback
+
         print(f"Change password error: {str(e)}")
         print(traceback.format_exc())
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal server error: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

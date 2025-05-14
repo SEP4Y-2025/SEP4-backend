@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.post("/environments/{env_id}/pots", response_model=AddPlantPotResponse)
-def add_plant_pot(env_id : str, pot: AddPlantPotRequest):
+def add_plant_pot(env_id: str, pot: AddPlantPotRequest):
     print("Received POST /pots with:", pot.model_dump())
     try:
         return PlantPotsService().add_plant_pot(env_id, pot)
@@ -46,7 +46,8 @@ def get_plant_pot(environment_id: str, pot_id: str):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/environments/{environment_id}/pots")
 def get_pots_by_environment(environment_id: str):
     try:

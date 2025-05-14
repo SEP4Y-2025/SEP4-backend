@@ -7,7 +7,11 @@ from core.config import MONGO_URI
 
 router = APIRouter()
 
-@router.put("/environments/{environment_id}/assistants", response_model=AddUserPermissionResponse)
+
+@router.put(
+    "/environments/{environment_id}/assistants",
+    response_model=AddUserPermissionResponse,
+)
 def add_user_permission(environment_id: str, user_permission: AddUserPermissionRequest):
     try:
         service = UsersService()
@@ -20,21 +24,20 @@ def add_user_permission(environment_id: str, user_permission: AddUserPermissionR
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/users/{user_id}/environments")
 def get_user_environments(user_id: str):
     try:
         service = UsersService()
         environments = service.get_user_environments(user_id)
 
-        return JSONResponse(
-            status_code=200,
-            content={"environments": environments}
-        )
+        return JSONResponse(status_code=200, content={"environments": environments})
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+
 @router.get("/users/{user_id}")
 def get_user(user_id: str):
     try:

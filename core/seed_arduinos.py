@@ -20,7 +20,7 @@ initial_arduinos = [
     {"_id": "pot_4", "active": False},
     {"_id": "pot_5", "active": False},
     {"_id": "pot_6", "active": False},
-    {"_id": "662ebf49c7b9e2a7681e4a54", "active": False}
+    {"_id": "662ebf49c7b9e2a7681e4a54", "active": False},
 ]
 
 # Initial environment data
@@ -30,8 +30,7 @@ initial_envs = [
         "name": "Greenhouse #1",
         "owner_id": ObjectId("662ebf49c7b9e2a7681e4a53"),
         "window_state": "closed",
-        "access_control": [
-        ],
+        "access_control": [],
         "plant_pots": [
             {
                 "pot_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
@@ -44,8 +43,8 @@ initial_envs = [
                     "light_intensity": 50,
                     "water_level": 750,
                     "water_tank_capacity": 1000,
-                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
-                }
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
             },
             {
                 "pot_id": ObjectId("662ebf49c7b9e2a7681e4a56"),
@@ -58,8 +57,8 @@ initial_envs = [
                     "light_intensity": 40,
                     "water_level": 750,
                     "water_tank_capacity": 1000,
-                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
-                }
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
             },
             {
                 "pot_id": ObjectId("662ebf49c7b9e2a7681e4a57"),
@@ -72,10 +71,10 @@ initial_envs = [
                     "light_intensity": 10,
                     "water_level": 750,
                     "water_tank_capacity": 1000,
-                    "measured_at": datetime(2025, 4, 29, 12, 0, 0)
-                }
-            }
-        ]
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
+            },
+        ],
     }
 ]
 
@@ -86,22 +85,22 @@ plant_types = [
         "name": "Rose",
         "watering_frequency": 2,
         "water_dosage": 50,
-        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a58"),
         "name": "Tulip",
         "watering_frequency": 3,
         "water_dosage": 40,
-        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a59"),
         "name": "Sunflower",
         "watering_frequency": 1,
         "water_dosage": 60,
-        "environment_id": ObjectId("680f8359688cb5341f9f9c19")
-    }
+        "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
+    },
 ]
 
 users = [
@@ -111,26 +110,23 @@ users = [
         "password": hash_password("password1"),
         "email": "email1@domain.com",
         "environments": [
-            {
-                "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
-                "role": "Owner"
-            }
-        ]
+            {"environment_id": ObjectId("680f8359688cb5341f9f9c19"), "role": "Owner"}
+        ],
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
         "username": "Bob",
         "password": hash_password("password2"),
         "email": "email2@domain.com",
-        "environments": []
+        "environments": [],
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
         "username": "Charlie",
         "password": hash_password("password3"),
         "email": "email3@domain.com",
-        "environments": []
-    }
+        "environments": [],
+    },
 ]
 
 

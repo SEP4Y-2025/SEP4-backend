@@ -22,7 +22,7 @@ def get_plant_types_by_environment(environment_id: str):
 
 class AddPlantTypeRequest(BaseModel):
     name: str
-    water_frequency: int
+    watering_frequency: int
     water_dosage: int
 
 

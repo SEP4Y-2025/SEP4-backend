@@ -4,6 +4,7 @@ from bson import ObjectId
 from utils.helper import convert_object_ids
 import traceback
 
+
 class EnvironmentsRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
@@ -24,8 +25,7 @@ class EnvironmentsRepository:
             traceback.print_exc()
             print(f"Error fetching environments: {e}")
             return []
-    
+
     def get_environment_by_id(self, environment_id: str):
-       env = self.collection.find_one({"_id": ObjectId(environment_id)})   
-       return env if env else None
-        
+        env = self.collection.find_one({"_id": ObjectId(environment_id)})
+        return env if env else None
