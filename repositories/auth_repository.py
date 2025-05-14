@@ -45,7 +45,6 @@ class AuthRepository:
             print(f"Error fetching user by ID: {str(e)}")
             return None
 
-
     def create_user(self, user_data: dict):
         try:
             print(f"Attempting to insert user: {user_data.get('username')}")
