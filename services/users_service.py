@@ -41,3 +41,9 @@ class UsersService:
                 "Invalid input: 'environment_id' and 'user_id' are required"
             )
         return self.repository.delete_permission(environment_id, user)
+    
+    def get_user_permissions(self, environment_id: str):
+        if not environment_id:
+            raise ValueError("Invalid input: 'environment_id' is required")
+        
+        return self.repository.get_user_permissions(environment_id)
