@@ -29,7 +29,9 @@ class PlantTypesService:
             )
 
         # Check if the environment exists
-        environment = self.repository.get_environment_by_id(plant_type["environment_id"])
+        environment = self.repository.get_environment_by_id(
+            plant_type["environment_id"]
+        )
         if not environment:
             raise ValueError(
                 f"Environment ID {plant_type['environment_id']} does not exist"

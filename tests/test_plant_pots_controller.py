@@ -87,7 +87,7 @@ def test_get_plant_pot_not_found(client):
             f"/environments/{environment_id}/pots/{non_existent_pot_id}"
         )
         assert response.status_code == 404
-        assert response.json() == {"detail": f"Unknown or unregistered Arduino"}
+        assert response.json() == {"detail": "Unknown or unregistered Arduino"}
 
 
 def test_delete_plant_pot_success(client):
