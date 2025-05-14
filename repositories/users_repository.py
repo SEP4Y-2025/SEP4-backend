@@ -120,3 +120,26 @@ class UsersRepository:
         except Exception as e:
             print(f"Error in delete_permission: {e}")
             raise
+
+    def get_user_permissions(self, environment_id: str):
+        if not environment_id:
+            raise ValueError("Invalid input: 'environment_id' is required")
+        try:
+            environment = self.env_collection.find_one(
+                {"_id": ObjectId(environment_id)},
+                {"access_control.user_id": 1, "access_control.role": 1},
+            )
+            if not environment:
+                raise ValueError("Environment not found")
+
+            permissions = environment.get("access_control", [])
+            user_permissions = [
+                {"user_id": str(perm["user_id"]), "role": perm["role"]}
+                for perm in permissions
+                if "user_id" in perm and "role" in perm
+            ]
+
+            return user_permissions
+        except Exception as e:
+            print(f"Error fetching user permissions: {e}")
+            raise

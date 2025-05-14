@@ -3,17 +3,9 @@
 from pydantic import BaseModel
 
 
-class AddUserPermissionRequest(BaseModel):
+class UserPermissionRequest(BaseModel):
     user_email: str
 
 
-class AddUserPermissionResponse(BaseModel):
+class UserPermissionResponse(BaseModel):
     message: str
-
-
-class DeleteUserPermissionResponse(BaseModel):
-    message: str
-
-
-class DeleteUserPermissionRequest(BaseModel):
-    user_email: str
