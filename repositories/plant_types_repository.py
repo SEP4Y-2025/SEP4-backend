@@ -29,7 +29,7 @@ class PlantTypesRepository:
             env_obj_id = ObjectId(environment_id)
 
             plant_types = list(
-                self.plant_type_collection.find({"plant_env_id": env_obj_id})
+                self.plant_type_collection.find({"environment_id": env_obj_id})
             )
 
             if not plant_types:
