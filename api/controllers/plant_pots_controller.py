@@ -41,11 +41,18 @@ def get_logs():
 @router.get("/environments/{environment_id}/pots/{pot_id}")
 def get_plant_pot(environment_id: str, pot_id: str):
     try:
-        return PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
+        pot = PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
+        if not pot:
+            raise HTTPException(status_code=404, detail="Plant pot not found")
+        return {"pot": pot}
     except ValueError as e:
+        if "not found" in str(e).lower():
+            raise HTTPException(status_code=404, detail=str(e))
+        elif "timeout" in str(e).lower():
+            raise HTTPException(status_code=408, detail=str(e))
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/environments/{environment_id}/pots")

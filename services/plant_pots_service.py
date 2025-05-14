@@ -88,7 +88,10 @@ class PlantPotsService:
         result = mqtt_client.send(f"/{pot_id}/data", payload)
 
         if result.get("error"):
-            raise ValueError(result["error"])
+            if result["error"] == "Timeout waiting for Arduino response":
+                raise ValueError("Timeout waiting for Arduino response")
+            else:
+                raise ValueError(result["error"])
 
         pot = self.plant_pots_repo.find_pot_by_id(pot_id)
         if not pot:
