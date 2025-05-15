@@ -23,36 +23,13 @@ class MQTTClient:
         self.sensor_readings_repo = SensorReadingsRepository()
         self.environments_repo = EnvironmentsRepository()
         self.arduinos_repo = ArduinosRepository()
-
-    def on_message(self, client, userdata, msg):
-        print(f"Received message on topic {msg.topic}")
-
-        ###########################################################
-        # This is temporary code to handle light sensor data
-        # if(msg.topic == "light"):
-        #     payload_str = msg.payload.decode('utf-8')
-        #     lines = payload_str.strip().split('\n')
-        #     for line in lines:
-        #         if "Light ADC Val:" in line:
-        #             parts = line.split(":")
-        #             if len(parts) == 2:
-        #                     value = int(parts[1].strip())
-        #                     self.sensor_readings_repo.create({"light": value})
-        #                     return
-        #             else :
-        #                 return
-        # return
-        ############################################################
-
-        data = json.loads(msg.payload.decode())
-        print(f"Received message with {data}")
-
-        if msg.topic == "/pot_1/sensors":
+        
+    def handle_sensor_readings(self, data):
             timestamp = time.time()
             dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
-
+            
             # (ISO 8601)
-            formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+            formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
             # Extract the sensor data from the message
 
             sensor_data = {
@@ -61,12 +38,12 @@ class MQTTClient:
                 "soil_humidity": data.get("soil_humidity"),
                 "light_intensity": data.get("light_intensity"),
                 "plant_pot_id": data.get("plant_pot_id"),
-                "timestamp": formatted_time,
+                "timestamp": formatted_time
             }
             # Store the sensor data in the database
             self.sensor_readings_repo.create(sensor_data)
             return
-
+        
     def handle_get_pot_data(self, data):
         timestamp = time.time()
         dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
@@ -126,13 +103,6 @@ class MQTTClient:
             topic = f"/{pot_id}/sensors"
             print(f"Subscribing to topic: {topic}")
             self.client.subscribe(topic)
-
-        # # Find the appropriate queue based on response topic and put the message in the queue
-        # if msg.topic and msg.topic in self.response_queues:
-        #     self.response_queues[msg.topic].put(data)
-        #     pending_requests_collection.delete_one(
-        #         {"response_topic": msg.topic}
-        #     )  # Remove from pending requests
 
     def start(self):
         parsed = urlparse(MQTT_BROKER_URL)
