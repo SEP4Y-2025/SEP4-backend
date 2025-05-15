@@ -23,8 +23,8 @@ class AuthService:
     def get_password_hash(self, password):
         return pwd_context.hash(password)
 
-    def authenticate_user(self, username: str, password: str):
-        user = self.auth_repository.find_user_by_username(username)
+    def authenticate_user(self, email: str, password: str):
+        user = self.auth_repository.find_user_by_email(email)
         if not user:
             return False
         if not self.verify_password(password, user["password"]):

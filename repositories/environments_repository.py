@@ -29,3 +29,90 @@ class EnvironmentsRepository:
     def get_environment_by_id(self, environment_id: str):
         env = self.collection.find_one({"_id": ObjectId(environment_id)})
         return env if env else None
+    
+    # def insert_pot(self, environment_id: str, pot_data: dict):
+    #     try:
+    #         result = self.collection.update_one(
+    #             {"_id": ObjectId(environment_id)},
+    #             {"$addToSet": {"plant_pots": pot_data}},
+    #         )
+    #         return result.modified_count > 0
+    #     except Exception as e:
+    #         traceback.print_exc()
+    #         return False
+        
+    def insert_pot(self, environment_id: str, pot_data: dict):
+        try:
+            # First, try to update the existing pot if it exists
+            result = self.collection.update_one(
+                {
+                    "_id": ObjectId(environment_id),
+                    "plant_pots.pot_id": pot_data["pot_id"],
+                },
+                {
+                    "$set": {
+                        "plant_pots.$": pot_data
+                    }
+                }
+            )
+
+            # If no pot was updated, insert the new one
+            if result.matched_count == 0:
+                result = self.collection.update_one(
+                    {"_id": ObjectId(environment_id)},
+                    {"$push": {"plant_pots": pot_data}},
+                )
+
+            return result.modified_count > 0
+        except Exception as e:
+            traceback.print_exc()
+            return False
+
+
+    def get_pots_by_environment(self, environment_id: str):
+        try:
+            env = self.collection.find_one(
+                {"_id": ObjectId(environment_id)},
+                {"plant_pots": 1},
+            )
+            return convert_object_ids(env.get("plant_pots", [])) if env else []
+        except Exception as e:
+            traceback.print_exc()
+            return []
+
+    def find_pot_by_id(self, pot_id: str):
+        try:
+            pipeline = [
+                {"$match": {"plant_pots.pot_id": pot_id}},
+                {"$project": {"plant_pots": 1}},
+                {"$unwind": "$plant_pots"},
+                {"$match": {"plant_pots.pot_id": pot_id}},
+                {"$replaceRoot": {"newRoot": "$plant_pots"}},
+            ]
+            result = list(self.collection.aggregate(pipeline))
+            return convert_object_ids(result[0]) if result else None
+        except Exception as e:
+            traceback.print_exc()
+            return None
+
+    def update_pot(self, pot_id: str, update_data: dict):
+        try:
+            result = self.collection.update_one(
+                {"plant_pots.pot_id": pot_id},
+                {"$set": {f"plant_pots.$.{k}": v for k, v in update_data.items()}},
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            traceback.print_exc()
+            return False
+
+    def delete_pot(self, pot_id: str):
+        try:
+            result = self.collection.update_many(
+                {},
+                {"$pull": {"plant_pots": {"pot_id": pot_id}}},
+            )
+            return result.modified_count > 0
+        except Exception as e:
+            traceback.print_exc()
+            return False

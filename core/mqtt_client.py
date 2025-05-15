@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
 from pymongo import MongoClient
 from repositories.sensor_readings_repository import SensorReadingsRepository
-from repositories.plant_pots_repository import PlantPotsRepository
+from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
 
 # MongoDB Client Setup
@@ -21,7 +21,7 @@ class MQTTClient:
         self.response_queues = {}  # Dictionary to hold response queues for each request
         self.client.on_message = self.on_message
         self.sensor_readings_repo = SensorReadingsRepository()
-        self.plant_pots_repo = PlantPotsRepository()
+        self.environments_repo = EnvironmentsRepository()
         self.arduinos_repo = ArduinosRepository()
 
     def on_message(self, client, userdata, msg):
@@ -75,20 +75,20 @@ class MQTTClient:
         pot_id = data.get("plant_pot_id")
 
         update_data = {
-            "temperature_celsius": data.get("temperature_celsius"),
-            "air_humidity_percentage": data.get("air_humidity_percentage"),
-            "soil_humidity_percentage": data.get("soil_humidity_percentage"),
-            "light_intensity_lux": data.get("light_intensity_lux"),
-            "water_tank_capacity_ml": data.get("water_tank_capacity_ml"),
-            "water_level_percentage": data.get("water_level_percentage"),
+            "temperature": data.get("temperature_celsius"),
+            "air_humidity": data.get("air_humidity_percentage"),
+            "soil_humidity": data.get("soil_humidity_percentage"),
+            "light_intensity": data.get("light_intensity_lux"),
+            "water_tank_capacity": data.get("water_tank_capacity_ml"),
+            "water_level": data.get("water_level_percentage"),
             "measured_at": formatted_time,
         }
 
-        result = self.plant_pots_repo.update_pot(pot_id, update_data)
+        result = self.environments_repo.update_pot(pot_id, update_data)
 
-        print(f"Pots: {self.plant_pots_repo.find_pot_by_id(pot_id)}")
+        print(f"Pots: {self.environments_repo.find_pot_by_id(pot_id)}")
 
-        if result.matched_count == 0:
+        if result == False:
             # print(f"Pot ID {pot_id} not updated")
             raise ValueError(f"Pot ID {pot_id} not found")
 
