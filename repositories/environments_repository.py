@@ -29,3 +29,11 @@ class EnvironmentsRepository:
     def get_environment_by_id(self, environment_id: str):
         env = self.collection.find_one({"_id": ObjectId(environment_id)})
         return env if env else None
+    
+    def add_environment(self, environment: dict) -> str:
+        try:
+            result = self.collection.insert_one(environment)
+            return str(result.inserted_id)
+        except Exception as e:
+            print(f"Error adding environment: {e}")
+            raise Exception("An error occurred while adding the environment.")
