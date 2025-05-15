@@ -48,6 +48,7 @@ class PlantTypesRepository:
     def post_plant_type(self, plant_type: dict):
         try:
             plant_type["environment_id"] = ObjectId(plant_type["environment_id"])
+
             result = self.plant_type_collection.insert_one(plant_type)
             return str(result.inserted_id)
         except Exception as e:

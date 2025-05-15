@@ -24,6 +24,10 @@ class PlantPotsService:
     def add_plant_pot(
         self, environment_id: str, pot: AddPlantPotRequest
     ) -> AddPlantPotResponse:
+        
+        if pot.plant_pot_label.strip() == "":
+            raise ValueError("Invalid plant pot label")
+        
         if not self.arduinos_repo.is_registered(pot.pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 
