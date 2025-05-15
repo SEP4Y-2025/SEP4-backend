@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
 from services.environments_service import EnvironmentsService
+from models.environment import AddEnvironmentRequest, AddEnvironmentResponse
 from utils.helper import JSONEncoder
 import json
 from utils.helper import convert_object_ids
@@ -54,3 +55,14 @@ def get_environment_by_id(environment_id: str):
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
+    
+@router.post("/environments", response_model=AddEnvironmentResponse)
+def add_environment(request: AddEnvironmentRequest):
+    try:
+        service = EnvironmentsService()
+        response = service.add_environment(request)
+        return response
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
