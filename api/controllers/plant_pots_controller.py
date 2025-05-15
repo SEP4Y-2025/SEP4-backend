@@ -64,7 +64,6 @@ def get_pots_by_environment(environment_id: str):
         service = PlantPotsService()
         pots = service.get_pots_by_environment(environment_id)
 
-        if not pots:
         if pots is None:
             raise HTTPException(status_code=500, detail="Internal server error")
 
