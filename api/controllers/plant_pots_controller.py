@@ -65,11 +65,13 @@ def get_pots_by_environment(environment_id: str):
         pots = service.get_pots_by_environment(environment_id)
 
         if not pots:
-            raise HTTPException(
-                status_code=404, detail="No plant pots found for the given environment"
-            )
+        if pots is None:
+            raise HTTPException(status_code=500, detail="Internal server error")
 
-        return {"pots": pots}
+        return {"pots": pots} 
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
