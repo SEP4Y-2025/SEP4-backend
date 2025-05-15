@@ -54,3 +54,23 @@ def get_environment_by_id(environment_id: str):
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
+    
+@router.delete("/environments/{environment_id}", response_class=JSONResponse)
+def delete_environment(environment_id: str):
+    try:
+        service = EnvironmentsService()
+        deleted = service.delete_environment(environment_id)
+        if not deleted:
+            return JSONResponse(
+                status_code=404, content={"message": "Environment could not be deleted"}
+            )
+        return JSONResponse(
+                status_code=200, content={"message": "Environment deleted successfully"}
+            )
+    except Exception as e:
+            import traceback
+
+            traceback.print_exc()
+            return JSONResponse(
+                status_code=500, content={"message": f"Internal server error: {str(e)}"}
+            )

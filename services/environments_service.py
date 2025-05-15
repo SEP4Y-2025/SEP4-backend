@@ -14,3 +14,6 @@ class EnvironmentsService:
 
     def get_environment_by_id(self, environment_id: str):
         return self.environments_repository.get_environment_by_id(environment_id)
+    
+    def delete_environment(self, environment_id: str):
+        return self.environments_repository.delete_environment(environment_id)
