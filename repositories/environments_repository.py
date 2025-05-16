@@ -29,8 +29,7 @@ class EnvironmentsRepository:
     def get_environment_by_id(self, environment_id: str):
         env = self.collection.find_one({"_id": ObjectId(environment_id)})
         return env if env else None
-    
-        
+
     def insert_pot(self, environment_id: str, pot_data: dict):
         try:
             # First, try to update the existing pot if it exists
@@ -39,11 +38,7 @@ class EnvironmentsRepository:
                     "_id": ObjectId(environment_id),
                     "plant_pots.pot_id": pot_data["pot_id"],
                 },
-                {
-                    "$set": {
-                        "plant_pots.$": pot_data
-                    }
-                }
+                {"$set": {"plant_pots.$": pot_data}},
             )
 
             # If no pot was updated, insert the new one
@@ -57,7 +52,6 @@ class EnvironmentsRepository:
         except Exception as e:
             traceback.print_exc()
             return False
-
 
     def get_pots_by_environment(self, environment_id: str):
         try:
@@ -106,8 +100,7 @@ class EnvironmentsRepository:
         except Exception as e:
             traceback.print_exc()
             return False
-        
-            
+
     def add_environment(self, environment: dict) -> str:
         try:
             result = self.collection.insert_one(environment)
@@ -115,8 +108,7 @@ class EnvironmentsRepository:
         except Exception as e:
             print(f"Error adding environment: {e}")
             raise Exception("An error occurred while adding the environment.")
-        
+
     def delete_environment(self, environment_id: str):
         result = self.collection.delete_one({"_id": ObjectId(environment_id)})
         return result.deleted_count > 0
-

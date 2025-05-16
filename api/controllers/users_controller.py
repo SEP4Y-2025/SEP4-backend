@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from models.user import (
     UserPermissionRequest,
@@ -9,6 +9,7 @@ from bson import ObjectId
 from core.config import MONGO_URI
 
 router = APIRouter()
+
 
 @router.put(
     "/environments/{environment_id}/assistants",
@@ -25,11 +26,12 @@ def add_user_permission(environment_id: str, user_permission: UserPermissionRequ
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.put(
     "/environments/{environment_id}/assistants",
     response_model=UserPermissionResponse,
 )
-
 @router.get("/users/{user_id}/environments")
 def get_user_environments(user_id: str):
     try:
@@ -58,12 +60,15 @@ def get_user(user_id: str):
 
 
 @router.delete(
-    "/environments/{environment_id}/assistants/{user_email}",
+    "/environments/{environment_id}/assistants",
     response_model=UserPermissionResponse,
 )
-def delete_user_permission(
-    environment_id: str, user_email: str
-):
+def delete_user_permission(environment_id: str, user_email: str = Query(...)):
+    if user_email.strip().lower() in ["", "none", "invalid"]:
+        raise HTTPException(
+            status_code=405,
+            detail="Invalid user permission data: 'user_email' is required",
+        )
     try:
         service = UsersService()
         service.delete_permission(environment_id, {"user_email": user_email})

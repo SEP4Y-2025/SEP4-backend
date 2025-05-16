@@ -9,7 +9,6 @@ class EnvironmentsService:
     def __init__(self):
         self.environments_repository = EnvironmentsRepository()
         self.plant_pots_service = PlantPotsService()
-        
 
     def get_environments(self):
         result = self.environments_repository.get_environments()
@@ -29,7 +28,7 @@ class EnvironmentsService:
             environment_id=inserted_id,
             name=request.name,
         )
-        
+
     def delete_environment(self, environment_id: str) -> bool:
         environment = self.environments_repository.get_environment_by_id(environment_id)
         if not environment:

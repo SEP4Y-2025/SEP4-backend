@@ -23,27 +23,27 @@ class MQTTClient:
         self.sensor_readings_repo = SensorReadingsRepository()
         self.environments_repo = EnvironmentsRepository()
         self.arduinos_repo = ArduinosRepository()
-        
-    def handle_sensor_readings(self, data):
-            timestamp = time.time()
-            dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
-            
-            # (ISO 8601)
-            formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
-            # Extract the sensor data from the message
 
-            sensor_data = {
-                "temperature": data.get("temperature"),
-                "air_humidity": data.get("air_humidity"),
-                "soil_humidity": data.get("soil_humidity"),
-                "light_intensity": data.get("light_intensity"),
-                "plant_pot_id": data.get("plant_pot_id"),
-                "timestamp": formatted_time
-            }
-            # Store the sensor data in the database
-            self.sensor_readings_repo.create(sensor_data)
-            return
-        
+    def handle_sensor_readings(self, data):
+        timestamp = time.time()
+        dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
+
+        # (ISO 8601)
+        formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+        # Extract the sensor data from the message
+
+        sensor_data = {
+            "temperature": data.get("temperature"),
+            "air_humidity": data.get("air_humidity"),
+            "soil_humidity": data.get("soil_humidity"),
+            "light_intensity": data.get("light_intensity"),
+            "plant_pot_id": data.get("plant_pot_id"),
+            "timestamp": formatted_time,
+        }
+        # Store the sensor data in the database
+        self.sensor_readings_repo.create(sensor_data)
+        return
+
     def handle_get_pot_data(self, data):
         timestamp = time.time()
         dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)

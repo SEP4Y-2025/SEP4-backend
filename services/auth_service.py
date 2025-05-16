@@ -90,6 +90,6 @@ class AuthService:
             return False
         new_hashed = self.get_password_hash(new_password)
         return self.auth_repository.update_user_password(email, new_hashed)
-    
+
     # def find_user_by_email(self, email: str):
     #     return self.auth_repository.find_user_by_email(email)

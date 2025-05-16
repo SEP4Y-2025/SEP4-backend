@@ -67,7 +67,7 @@ def get_pots_by_environment(environment_id: str):
         if pots is None:
             raise HTTPException(status_code=500, detail="Internal server error")
 
-        return {"pots": pots} 
+        return {"pots": pots}
 
     except HTTPException:
         raise

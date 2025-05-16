@@ -67,38 +67,33 @@ def test_delete_user_permission_success(client):
     mock_response = {
         "message": "User permission deleted successfully",
     }
-    payload = {"user_email": "email2@domain.com"}
+    email = "email2@domain.com"
     with patch(
         "services.users_service.UsersService.delete_permission", return_value=None
     ):
-        response = client.request(
-            "DELETE",
-            "/environments/env_1/assistants",
-            json=payload,
-        )
-    assert response.status_code == 200
-    assert response.json() == mock_response
+        response = client.delete(f"/environments/env_1/assistants/{email}")
+        assert response.status_code == 200
+        assert response.json() == mock_response
 
 
-def test_delete_user_permission_missing_data(client):
-    payload = {"user_email": ""}
+def test_delete_user_permission_success(client):
+    email = "user@example.com"
+    environment_id = "env_1"
 
     with patch("services.users_service.UsersService.delete_permission") as mock_service:
-        mock_service.side_effect = ValueError(
-            "Invalid user permission data: 'user_email' is required"
+        mock_service.return_value = None
+
+        response = client.delete(
+            f"/environments/{environment_id}/assistants", params={"user_email": email}
         )
-        response = client.request(
-            "DELETE",
-            "/environments/env_1/assistants",
-            json=payload,
-        )
-        assert response.status_code == 400
-        assert "Invalid user permission data" in response.json()["detail"]
+
+        assert response.status_code == 200
+        assert response.json() == {"message": "User permission deleted successfully"}
 
 
 def test_get_environment_permissions_success(client):
     mock_response = {
-        "permissions": [
+        "assistants": [
             {"user_id": "662ebf49c7b9e2a7681e4a55", "role": "Plant Assistant"},
             {"user_id": "662ebf49c7b9e2a7681e4a54", "role": "Plant Assistant"},
         ]
@@ -106,7 +101,7 @@ def test_get_environment_permissions_success(client):
 
     with patch(
         "services.users_service.UsersService.get_user_permissions",
-        return_value=mock_response["permissions"],
+        return_value=mock_response["assistants"],
     ):
         response = client.get("/environments/env_1/assistants")
         assert response.status_code == 200

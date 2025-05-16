@@ -19,8 +19,8 @@ initial_arduinos = [
     {"_id": "pot_3", "active": False},
     {"_id": "pot_4", "active": False},
     {"_id": "pot_5", "active": False},
-    {"_id": "pot_6", "active": False}#,
-    #{"_id": "662ebf49c7b9e2a7681e4a54", "active": False}, #Isn't this a user?
+    {"_id": "pot_6", "active": False},  # ,
+    # {"_id": "662ebf49c7b9e2a7681e4a54", "active": False}, #Isn't this a user?
 ]
 
 # Initial environment data
@@ -76,7 +76,7 @@ initial_envs = [
             },
         ],
     },
-        {
+    {
         "_id": ObjectId("680f8359688cb5341f9f9c20"),
         "name": "Greenhouse #2",
         "owner_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
@@ -126,7 +126,7 @@ initial_envs = [
                 },
             },
         ],
-    }
+    },
 ]
 
 # Initial plant types
@@ -152,14 +152,14 @@ plant_types = [
         "water_dosage": 60,
         "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
     },
-        {
+    {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a60"),
         "name": "Mint",
         "watering_frequency": 5,
         "water_dosage": 60,
         "environment_id": ObjectId("680f8359688cb5341f9f9c20"),
     },
-            {
+    {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a61"),
         "name": "Daisy",
         "watering_frequency": 4,
@@ -183,7 +183,9 @@ users = [
         "username": "Bob",
         "password": hash_password("password2"),
         "email": "email2@domain.com",
-        "environments": [{"environment_id": ObjectId("680f8359688cb5341f9f9c20"), "role": "Owner"}],
+        "environments": [
+            {"environment_id": ObjectId("680f8359688cb5341f9f9c20"), "role": "Owner"}
+        ],
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
@@ -226,4 +228,3 @@ for user in users:
         print(f"Inserted: {user['_id']}")
     except Exception as e:
         print(f"Skipping {user['_id']}: {e}")
-

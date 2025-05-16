@@ -60,6 +60,7 @@ def get_environment_by_id(environment_id: str):
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
 
+
 @router.post("/environments", response_model=AddEnvironmentResponse)
 def add_environment(request: AddEnvironmentRequest):
     try:
