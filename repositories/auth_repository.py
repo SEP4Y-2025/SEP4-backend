@@ -22,19 +22,19 @@ class AuthRepository:
             print(f"MongoDB connection error: {str(e)}")
             raise
 
-    def find_user_by_username(self, username: str):
+    def find_user_by_email(self, email: str):
         try:
-            print(f"Checking if username exists: '{username}'")
+            print(f"Checking if email exists: '{email}'")
             # Add a debug query to see what's in the database
-            all_users = list(self.collection.find({}, {"username": 1}))
+            all_users = list(self.collection.find({}, {"email": 1}))
             print(f"All users in database: {all_users}")
 
             # Perform the actual query
-            user = self.collection.find_one({"username": username})
+            user = self.collection.find_one({"email": email})
             print(f"User found: {user}")
             return user
         except Exception as e:
-            print(f"Error checking username: {str(e)}")
+            print(f"Error checking email: {str(e)}")
             # Return None on error instead of a possible exception
             return None
 
@@ -58,12 +58,12 @@ class AuthRepository:
             print(traceback.format_exc())
             return None
 
-    def update_user_password(self, username, new_password: str):
+    def update_user_password(self, email, new_password: str):
         try:
             result = self.collection.update_one(
-                {"username": username}, {"$set": {"password": new_password}}
+                {"email": email}, {"$set": {"password": new_password}}
             )
             return result.modified_count > 0
         except Exception as e:
-            print(f"Error updating password for user {username}: {str(e)}")
+            print(f"Error updating password for user {email}: {str(e)}")
             return False

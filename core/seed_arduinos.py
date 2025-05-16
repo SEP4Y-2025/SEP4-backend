@@ -19,8 +19,8 @@ initial_arduinos = [
     {"_id": "pot_3", "active": False},
     {"_id": "pot_4", "active": False},
     {"_id": "pot_5", "active": False},
-    {"_id": "pot_6", "active": False},
-    {"_id": "662ebf49c7b9e2a7681e4a54", "active": False},
+    {"_id": "pot_6", "active": False}#,
+    #{"_id": "662ebf49c7b9e2a7681e4a54", "active": False}, #Isn't this a user?
 ]
 
 # Initial environment data
@@ -33,8 +33,8 @@ initial_envs = [
         "access_control": [],
         "plant_pots": [
             {
-                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
-                "name": "pot1",
+                "pot_id": "pot_2",
+                "label": "pot2",
                 "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "state": {
                     "air_humidity": 30,
@@ -47,8 +47,8 @@ initial_envs = [
                 },
             },
             {
-                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a56"),
-                "name": "pot2",
+                "pot_id": "pot_3",
+                "label": "pot3",
                 "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
                 "state": {
                     "air_humidity": 10,
@@ -61,13 +61,64 @@ initial_envs = [
                 },
             },
             {
-                "pot_id": ObjectId("662ebf49c7b9e2a7681e4a57"),
-                "name": "pot3",
+                "pot_id": "pot_4",
+                "label": "pot4",
                 "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a58"),
                 "state": {
                     "air_humidity": 20,
                     "temperature": 17,
                     "soil_humidity": 10,
+                    "light_intensity": 10,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
+            },
+        ],
+    },
+        {
+        "_id": ObjectId("680f8359688cb5341f9f9c20"),
+        "name": "Greenhouse #2",
+        "owner_id": ObjectId("662ebf49c7b9e2a7681e4a54"),
+        "window_state": "open",
+        "access_control": [],
+        "plant_pots": [
+            {
+                "pot_id": "pot_5",
+                "label": "pot5",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a60"),
+                "state": {
+                    "air_humidity": 30,
+                    "temperature": 20,
+                    "soil_humidity": 20,
+                    "light_intensity": 50,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
+            },
+            {
+                "pot_id": "pot_6",
+                "label": "pot6",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a61"),
+                "state": {
+                    "air_humidity": 10,
+                    "temperature": 22,
+                    "soil_humidity": 30,
+                    "light_intensity": 40,
+                    "water_level": 750,
+                    "water_tank_capacity": 1000,
+                    "measured_at": datetime(2025, 4, 29, 12, 0, 0),
+                },
+            },
+            {
+                "pot_id": "pot_7",
+                "label": "pot7",
+                "plant_type_id": ObjectId("662ebf49c7b9e2a7681e4a61"),
+                "state": {
+                    "air_humidity": 28,
+                    "temperature": 21,
+                    "soil_humidity": 31,
                     "light_intensity": 10,
                     "water_level": 750,
                     "water_tank_capacity": 1000,
@@ -101,6 +152,20 @@ plant_types = [
         "water_dosage": 60,
         "environment_id": ObjectId("680f8359688cb5341f9f9c19"),
     },
+        {
+        "_id": ObjectId("662ebf49c7b9e2a7681e4a60"),
+        "name": "Mint",
+        "watering_frequency": 5,
+        "water_dosage": 60,
+        "environment_id": ObjectId("680f8359688cb5341f9f9c20"),
+    },
+            {
+        "_id": ObjectId("662ebf49c7b9e2a7681e4a61"),
+        "name": "Daisy",
+        "watering_frequency": 4,
+        "water_dosage": 80,
+        "environment_id": ObjectId("680f8359688cb5341f9f9c20"),
+    },
 ]
 
 users = [
@@ -118,7 +183,7 @@ users = [
         "username": "Bob",
         "password": hash_password("password2"),
         "email": "email2@domain.com",
-        "environments": [],
+        "environments": [{"environment_id": ObjectId("680f8359688cb5341f9f9c20"), "role": "Owner"}],
     },
     {
         "_id": ObjectId("662ebf49c7b9e2a7681e4a55"),
@@ -161,3 +226,4 @@ for user in users:
         print(f"Inserted: {user['_id']}")
     except Exception as e:
         print(f"Skipping {user['_id']}: {e}")
+
