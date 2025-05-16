@@ -73,7 +73,7 @@ jobs:
             --dns-name-label sprint4-backend \
             --ip-address public \
             --os-type Linux \
-            --ports 80 \
+            --ports 8000 \
             --environment-variables \
                 MONGO_URL="${{ secrets.MONGO_URL }}" \
                 MQTT_BROKER_URL="${{ secrets.MQTT_BROKER_URL }}"
