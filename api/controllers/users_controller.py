@@ -10,7 +10,6 @@ from core.config import MONGO_URI
 
 router = APIRouter()
 
-
 @router.put(
     "/environments/{environment_id}/assistants",
     response_model=UserPermissionResponse,

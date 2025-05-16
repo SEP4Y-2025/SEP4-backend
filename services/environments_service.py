@@ -2,11 +2,14 @@ from repositories.environments_repository import EnvironmentsRepository
 from models.environment import AddEnvironmentRequest, AddEnvironmentResponse
 from bson import ObjectId
 import datetime
+from services.plant_pots_service import PlantPotsService
 
 
 class EnvironmentsService:
     def __init__(self):
         self.environments_repository = EnvironmentsRepository()
+        self.plant_pots_service = PlantPotsService()
+        
 
     def get_environments(self):
         result = self.environments_repository.get_environments()
@@ -26,6 +29,18 @@ class EnvironmentsService:
             environment_id=inserted_id,
             name=request.name,
         )
+        
+    def delete_environment(self, environment_id: str) -> bool:
+        environment = self.environments_repository.get_environment_by_id(environment_id)
+        if not environment:
+            raise ValueError(f"Environment with ID {environment_id} not found")
 
-    def delete_environment(self, environment_id: str):
+        for pot in environment.get("plant_pots", []):
+            pot_id = pot.get("pot_id")
+            if pot_id:
+                try:
+                    self.plant_pots_service.delete_plant_pot(pot_id)
+                except Exception as e:
+                    print(f"Failed to delete pot {pot_id}: {e}")
+
         return self.environments_repository.delete_environment(environment_id)

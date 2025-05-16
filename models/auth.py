@@ -3,7 +3,7 @@ from typing import Optional
 
 
 class LoginRequest(BaseModel):
-    username: str
+    email: str
     password: str
 
 
@@ -21,6 +21,6 @@ class TokenResponse(BaseModel):
 
 
 class ChangePasswordRequest(BaseModel):
-    username: str
+    email: str
     old_password: str
     new_password: str
