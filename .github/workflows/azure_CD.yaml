@@ -3,7 +3,7 @@ name: Deploy Backend to Azure ACI
 on:
   pull_request:
     branches:
-      - main
+      - master
   workflow_dispatch:
     inputs:
       tag:
