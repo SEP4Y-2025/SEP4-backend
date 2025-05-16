@@ -95,27 +95,23 @@ def test_delete_user_permission_missing_data(client):
         assert response.status_code == 400
         assert "Invalid user permission data" in response.json()["detail"]
 
+
 def test_get_environment_permissions_success(client):
     mock_response = {
         "permissions": [
-            {
-                "user_id": "662ebf49c7b9e2a7681e4a55",
-                "role": "Plant Assistant"
-            },
-            {
-                "user_id": "662ebf49c7b9e2a7681e4a54",
-                "role": "Plant Assistant"
-            }
+            {"user_id": "662ebf49c7b9e2a7681e4a55", "role": "Plant Assistant"},
+            {"user_id": "662ebf49c7b9e2a7681e4a54", "role": "Plant Assistant"},
         ]
     }
 
     with patch(
         "services.users_service.UsersService.get_user_permissions",
-        return_value=mock_response["permissions"]
+        return_value=mock_response["permissions"],
     ):
         response = client.get("/environments/env_1/assistants")
         assert response.status_code == 200
         assert response.json() == mock_response
+
 
 def test_get_environment_permissions_not_found(client):
     with patch(

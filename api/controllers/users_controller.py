@@ -1,6 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import JSONResponse
-from models.user import (UserPermissionRequest, UserPermissionResponse,)
+from models.user import (
+    UserPermissionRequest,
+    UserPermissionResponse,
+)
 from services.users_service import UsersService
 from bson import ObjectId
 from core.config import MONGO_URI
@@ -70,6 +73,7 @@ def delete_user_permission(
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/environments/{environment_id}/assistants")
 def get_user_permissions(environment_id: str):
