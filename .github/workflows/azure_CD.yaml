@@ -1,12 +1,15 @@
 name: Deploy Backend to Azure ACI
 
 on:
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       tag:
         description: 'Docker image tag (e.g. sprint1, sprint2)'
         required: true
-        default: 'sprint1'
+        default: 'test'
 
 env:
   RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
