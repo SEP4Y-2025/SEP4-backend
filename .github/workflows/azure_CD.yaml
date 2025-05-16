@@ -50,21 +50,21 @@ jobs:
       run: |
         az container delete \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name backend-${{ github.event.inputs.tag }} \
+          --name plantandgo-backend \
           --yes || echo "No existing container to delete"
 
     - name: Deploy to Azure Container Instances
       run: |
         az container create \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name backend-${{ github.event.inputs.tag }} \
+          --name plantandgo-backend \
           --image ${{ env.ACR_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag }} \
           --cpu 1 \
           --memory 1.5 \
           --registry-login-server ${{ env.ACR_SERVER }} \
           --registry-username ${{ env.ACR_NAME }} \
           --registry-password "${{ secrets.ACR_PASSWORD }}" \
-          --dns-name-label backend \
+          --dns-name-label plantandgo-backend \
           --ip-address public \
           --os-type Linux \
           --ports 80 \
