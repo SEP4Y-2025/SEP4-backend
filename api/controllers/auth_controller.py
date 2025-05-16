@@ -18,13 +18,17 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         if not user:
             raise HTTPException(
                 status_code=401,
-                detail="Incorrect username or password",
+                detail="Incorrect email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
         access_token_expires = timedelta(minutes=30)
         token_data = auth_service.create_access_token(
-            data={"sub": user["username"], "id": str(user["_id"])},
+            data={
+                "sub": user["username"],
+                "email": user["email"],
+                "id": str(user["_id"]),
+            },
             expires_delta=access_token_expires,
         )
 
@@ -67,7 +71,7 @@ async def change_password(data: ChangePasswordRequest):
     try:
         auth_service = AuthService()
         success = auth_service.change_password(
-            data.username, data.old_password, data.new_password
+            data.email, data.old_password, data.new_password
         )
         if not success:
             raise HTTPException(status_code=400, detail="Failed to change password")

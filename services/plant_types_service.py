@@ -28,6 +28,12 @@ class PlantTypesService:
                 "Invalid plant type data: 'plant_type_name' and 'plant_env_id' are required"
             )
 
+        if plant_type.get("water_dosage") <= 0:
+            raise ValueError("Water dosage must be greater than 0")
+
+        if plant_type.get("watering_frequency") <= 0:
+            raise ValueError("Watering frequency must be greater than 0")
+
         # Check if the environment exists
         environment = self.repository.get_environment_by_id(
             plant_type["environment_id"]

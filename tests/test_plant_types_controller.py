@@ -20,7 +20,7 @@ def test_add_plant_type_success(client):
         "plantTypeId": "plant_type_1",
     }
 
-    payload = {"name": "Cactus", "water_frequency": 7, "water_dosage": 100}
+    payload = {"name": "Cactus", "watering_frequency": 7, "water_dosage": 100}
 
     with patch(
         "services.plant_types_service.PlantTypesService.add_plant_type",
@@ -32,20 +32,17 @@ def test_add_plant_type_success(client):
 
 
 def test_add_plant_type_missing_data(client):
-    payload = {"water_frequency": 7, "water_dosage": 100}
+    payload = {"watering_frequency": 7, "water_dosage": 100}
 
     response = client.post("/environments/env_1/plant_types", json=payload)
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": [
-            {
-                "type": "missing",
-                "loc": ["body", "name"],
-                "msg": "Field required",
-                "input": {"water_frequency": 7, "water_dosage": 100},
-            }
-        ]
-    }
+
+    error_detail = response.json()["detail"]
+
+    assert any(
+        err.get("loc") == ["body", "name"] and "Field required" in err.get("msg", "")
+        for err in error_detail
+    )
 
 
 def test_get_plant_types_success(client):

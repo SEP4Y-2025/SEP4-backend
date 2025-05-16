@@ -22,7 +22,7 @@ class UsersRepository:
                 {"_id": ObjectId(environment_id)},
                 {
                     "$addToSet": {
-                        "accessControl": {
+                        "access_control": {
                             "user_id": user_id,
                             "role": "Plant Assistant",
                         }
@@ -78,4 +78,69 @@ class UsersRepository:
             return convert_object_ids(user)
         except Exception as e:
             print(f"Error in get_user: {e}")
+            raise
+
+    def delete_permission(self, environment_id: str, user: dict):
+        if not user.get("user_email"):
+            raise ValueError(
+                "Invalid input: 'environment_id' and 'user_id' are required"
+            )
+
+        try:
+            user = self.user_collection.find_one({"email": user["user_email"]})
+            if not user:
+                raise ValueError("Invalid user data: 'user_email' is required")
+            user_id = user["_id"]
+
+            result = self.env_collection.update_one(
+                {"_id": ObjectId(environment_id)},
+                {
+                    "$pull": {
+                        "access_control": {
+                            "user_id": user_id,
+                            "role": "Plant Assistant",
+                        }
+                    }
+                },
+            )
+            if result.modified_count == 0:
+                raise ValueError(f"No environment found with ID {environment_id}")
+
+            self.user_collection.update_one(
+                {"_id": user_id},
+                {
+                    "$pull": {
+                        "environments": {
+                            "environment_id": ObjectId(environment_id),
+                            "role": "Plant Assistant",
+                        }
+                    }
+                },
+            )
+            return True
+        except Exception as e:
+            print(f"Error in delete_permission: {e}")
+            raise
+
+    def get_user_permissions(self, environment_id: str):
+        if not environment_id:
+            raise ValueError("Invalid input: 'environment_id' is required")
+        try:
+            environment = self.env_collection.find_one(
+                {"_id": ObjectId(environment_id)},
+                {"access_control.user_id": 1, "access_control.role": 1},
+            )
+            if not environment:
+                raise ValueError("Environment not found")
+
+            permissions = environment.get("access_control", [])
+            user_permissions = [
+                {"user_id": str(perm["user_id"]), "role": perm["role"]}
+                for perm in permissions
+                if "user_id" in perm and "role" in perm
+            ]
+
+            return user_permissions
+        except Exception as e:
+            print(f"Error fetching user permissions: {e}")
             raise

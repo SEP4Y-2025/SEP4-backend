@@ -1,6 +1,5 @@
 from repositories.users_repository import UsersRepository
 from services.environments_service import EnvironmentsService
-from utils.helper import convert_object_ids
 
 
 class UsersService:
@@ -35,3 +34,16 @@ class UsersService:
             raise ValueError("User not found")
 
         return user
+
+    def delete_permission(self, environment_id: str, user: dict):
+        if not user.get("user_email"):
+            raise ValueError(
+                "Invalid input: 'environment_id' and 'user_id' are required"
+            )
+        return self.repository.delete_permission(environment_id, user)
+
+    def get_user_permissions(self, environment_id: str):
+        if not environment_id:
+            raise ValueError("Invalid input: 'environment_id' is required")
+
+        return self.repository.get_user_permissions(environment_id)

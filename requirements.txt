@@ -5,3 +5,5 @@ paho-mqtt
 python-multipart
 pyjwt
 passlib[bcrypt]
+bcrypt
+python-dotenv
