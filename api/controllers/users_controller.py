@@ -26,7 +26,10 @@ def add_user_permission(environment_id: str, user_permission: UserPermissionRequ
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+@router.put(
+    "/environments/{environment_id}/assistants",
+    response_model=UserPermissionResponse,
+)
 
 @router.get("/users/{user_id}/environments")
 def get_user_environments(user_id: str):
@@ -56,16 +59,16 @@ def get_user(user_id: str):
 
 
 @router.delete(
-    "/environments/{environment_id}/assistants",
+    "/environments/{environment_id}/assistants/{user_email}",
     response_model=UserPermissionResponse,
 )
-def delete_user_permission(environment_id: str, user_permission: UserPermissionRequest):
+def delete_user_permission(
+    environment_id: str, user_email: str
+):
     try:
         service = UsersService()
-        service.delete_permission(environment_id, user_permission.dict())
-        return JSONResponse(
-            status_code=200, content={"message": "User permission deleted successfully"}
-        )
+        service.delete_permission(environment_id, {"user_email": user_email})
+        return UserPermissionResponse(message="User permission deleted successfully")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
@@ -77,7 +80,7 @@ def get_user_permissions(environment_id: str):
     try:
         service = UsersService()
         permissions = service.get_user_permissions(environment_id)
-        return JSONResponse(status_code=200, content={"permissions": permissions})
+        return JSONResponse(status_code=200, content={"assistants": permissions})
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
