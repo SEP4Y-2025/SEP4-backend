@@ -26,3 +26,6 @@ class EnvironmentsService:
             environment_id=inserted_id,
             name=request.name
         )
+    
+    def delete_environment(self, environment_id: str):
+        return self.environments_repository.delete_environment(environment_id)
