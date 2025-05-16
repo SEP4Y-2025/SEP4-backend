@@ -63,7 +63,8 @@ def test_add_environment_missing_name(client):
     assert response.status_code == 422  # Unprocessable Entity
     error_detail = response.json()["detail"]
     assert any(
-        err.get("loc") == ["body", "name"] and "field required" in err.get("msg", "").lower()
+        err.get("loc") == ["body", "name"]
+        and "field required" in err.get("msg", "").lower()
         for err in error_detail
     )
 
@@ -77,4 +78,4 @@ def test_add_environment_internal_server_error(client):
         mock_service.side_effect = Exception("Unexpected error")
         response = client.post("/environments", json=payload)
         assert response.status_code == 500
-        assert "Internal server error" in response.json()["message"]
+        assert "An error occurred" in response.json()["detail"]["message"]

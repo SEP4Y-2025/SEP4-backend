@@ -55,7 +55,8 @@ def get_environment_by_id(environment_id: str):
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
-    
+
+
 @router.post("/environments", response_model=AddEnvironmentResponse)
 def add_environment(request: AddEnvironmentRequest):
     try:
@@ -65,9 +66,11 @@ def add_environment(request: AddEnvironmentRequest):
     except ValueError as e:
         raise HTTPException(status_code=400, detail={"message": str(e)})
     except Exception as e:
-        raise HTTPException(status_code=500, detail={"message": f"An error occurred: {str(e)}"})
+        raise HTTPException(
+            status_code=500, detail={"message": f"An error occurred: {str(e)}"}
+        )
 
-    
+
 @router.delete("/environments/{environment_id}", response_class=JSONResponse)
 def delete_environment(environment_id: str):
     try:
@@ -78,12 +81,12 @@ def delete_environment(environment_id: str):
                 status_code=404, content={"message": "Environment could not be deleted"}
             )
         return JSONResponse(
-                status_code=200, content={"message": "Environment deleted successfully"}
-            )
+            status_code=200, content={"message": "Environment deleted successfully"}
+        )
     except Exception as e:
-            import traceback
+        import traceback
 
-            traceback.print_exc()
-            return JSONResponse(
-                status_code=500, content={"message": f"Internal server error: {str(e)}"}
-            )
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500, content={"message": f"Internal server error: {str(e)}"}
+        )

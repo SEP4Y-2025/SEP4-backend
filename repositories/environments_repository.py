@@ -29,7 +29,7 @@ class EnvironmentsRepository:
     def get_environment_by_id(self, environment_id: str):
         env = self.collection.find_one({"_id": ObjectId(environment_id)})
         return env if env else None
-    
+
     def add_environment(self, environment: dict) -> str:
         try:
             result = self.collection.insert_one(environment)
@@ -37,7 +37,7 @@ class EnvironmentsRepository:
         except Exception as e:
             print(f"Error adding environment: {e}")
             raise Exception("An error occurred while adding the environment.")
-    
+
     def delete_environment(self, environment_id: str):
         result = self.collection.delete_one({"_id": ObjectId(environment_id)})
         return result.deleted_count > 0
