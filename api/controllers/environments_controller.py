@@ -63,9 +63,9 @@ def add_environment(request: AddEnvironmentRequest):
         response = service.add_environment(request)
         return response
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail={"message": str(e)})
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail={"message": f"An error occurred: {str(e)}"})
 
     
 @router.delete("/environments/{environment_id}", response_class=JSONResponse)
