@@ -113,14 +113,14 @@ class PlantPotsService:
             plant_type_name=plant_type["name"],
             watering_frequency=plant_type["watering_frequency"],
             water_dosage=plant_type["water_dosage"],
-            environment_id=pot["environment_id"],
-            soil_humidity_percentage=pot["soil_humidity"],
-            air_humidity_percentage=pot["air_humidity"],
-            temperature_celsius=pot["temperature"],
-            light_intensity_lux=pot["light_intensity"],
-            water_tank_capacity_ml=pot["water_tank_capacity"],
-            water_level_percentage=pot["water_level"],
-            measured_at=pot["measured_at"],
+            environment_id=env_id,
+            soil_humidity_percentage=pot["state"]["soil_humidity"],
+            air_humidity_percentage=pot["state"]["air_humidity"],
+            temperature_celsius=pot["state"]["temperature"],
+            light_intensity_lux=pot["state"]["light_intensity"],
+            water_tank_capacity_ml=pot["state"]["water_tank_capacity"],
+            water_level_percentage=pot["state"]["water_level"],
+            measured_at=pot["state"]["measured_at"],
         )
 
     def get_pots_by_environment(self, environment_id: str):
