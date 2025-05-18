@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Security
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from models.user import (
     UserPermissionRequest,
     UserPermissionResponse,
@@ -7,9 +8,10 @@ from models.user import (
 from services.users_service import UsersService
 from bson import ObjectId
 from core.config import MONGO_URI
+from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
-
+security = HTTPBearer()
 
 @router.put(
     "/environments/{environment_id}/assistants",
@@ -17,6 +19,11 @@ router = APIRouter()
 )
 def add_user_permission(environment_id: str, user_permission: UserPermissionRequest):
     try:
+        print(f"Adding user permission")
+        credentials: HTTPAuthorizationCredentials = Security(security)
+        token = credentials.credentials
+        decoded_token = decode_jwtheader(token)
+        print(f"Decoded token: {decoded_token}")
         service = UsersService()
         service.add_permission(environment_id, user_permission.dict())
         return UserPermissionResponse(

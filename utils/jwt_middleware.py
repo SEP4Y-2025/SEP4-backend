@@ -35,3 +35,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
 
     return user
+
+def decode_jwtheader(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM], options={"verify_signature": False})
+        return payload
+    except PyJWTError:
+        return None
