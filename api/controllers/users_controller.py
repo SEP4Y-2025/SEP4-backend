@@ -14,18 +14,18 @@ router = APIRouter()
 security = HTTPBearer()
 
 @router.put(
-    "/environments/{environment_id}/assistants",
+    "/environments/{environment_id}/assistants/{user_email}",
     response_model=UserPermissionResponse,
 )
-def add_user_permission(environment_id: str, user_permission: UserPermissionRequest):
+def add_user_permission(environment_id: str, user_email: str = Query(...)):
     try:
-        print(f"Adding user permission")
-        credentials: HTTPAuthorizationCredentials = Security(security)
-        token = credentials.credentials
-        decoded_token = decode_jwtheader(token)
-        print(f"Decoded token: {decoded_token}")
+        # print(f"Adding user permission")
+        # credentials: HTTPAuthorizationCredentials = Security(security)
+        # token = credentials.credentials
+        # decoded_token = decode_jwtheader(token)
+        # print(f"Decoded token: {decoded_token}")
         service = UsersService()
-        service.add_permission(environment_id, user_permission.dict())
+        service.add_permission(environment_id, user_email)
         return UserPermissionResponse(
             message="User permission added successfully",
         )
