@@ -11,7 +11,7 @@ from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
 
-@router.put(
+@router.post(
     "/environments/{environment_id}/assistants",
     response_model=UserPermissionResponse,
 )
