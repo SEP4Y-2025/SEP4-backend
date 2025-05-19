@@ -58,12 +58,13 @@ class AuthRepository:
             print(traceback.format_exc())
             return None
 
-    def update_user_password(self, email, new_password: str):
+    def update_user_password(self, user_id: str, new_password: str):
         try:
             result = self.collection.update_one(
-                {"email": email}, {"$set": {"password": new_password}}
+                {"_id": ObjectId(user_id)},
+                {"$set": {"password": new_password}},
             )
             return result.modified_count > 0
         except Exception as e:
-            print(f"Error updating password for user {email}: {str(e)}")
+            print(f"Error updating password for user {user_id}: {str(e)}")
             return False

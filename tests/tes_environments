@@ -31,7 +31,7 @@ def test_add_get_delete_environment():
     assert del_response.status_code == 200
     assert "deleted" in del_response.json()["message"].lower()
 
-    # 5. Get by id after delete (should be 404)
+    # 5. Get by id after delete (shoxuld be 404)
     get_after_del = client.get(f"/environments/{env_id}")
     assert get_after_del.status_code == 404
 

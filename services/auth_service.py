@@ -6,6 +6,7 @@ from repositories.auth_repository import AuthRepository
 from repositories.users_repository import UsersRepository
 
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -83,15 +84,16 @@ class AuthService:
             print(traceback.format_exc())
             return None
 
-    def change_password(self, email: str, old_password: str, new_password: str):
-        user = self.auth_repository.find_user_by_email(email)
+    def change_password(self, user_id: str, old_password: str, new_password: str):
+        user = self.auth_repository.find_user_by_id(user_id)
         if not user:
-            print(f"User {email} not found")
+            print(f"User with ID {user_id} not found")
             return False
         if not self.verify_password(old_password, user["password"]):
+            print("Old password is incorrect")
             return False
         new_hashed = self.get_password_hash(new_password)
-        return self.auth_repository.update_user_password(email, new_hashed)
+        return self.auth_repository.update_user_password(user_id, new_hashed)
 
     def check_user_permissions(self, user_id: str, environment_id: str):
         role = self.users_repository.get_user_role(user_id, environment_id)
