@@ -23,6 +23,8 @@ class EnvironmentsService:
         return self.environments_repository.get_environment_by_id(environment_id)
 
     def add_environment(self, request: AddEnvironmentRequest, request_user_id: str) -> AddEnvironmentResponse:
+        if self.environments_repository.environment_name_exists(request_user_id, request.name):
+            raise ValueError("Environment name already exists for this user.")
         environment_dict = request.dict()
         environment_dict.setdefault("owner_id", request_user_id)
         environment_dict.setdefault("window_state", "closed")
