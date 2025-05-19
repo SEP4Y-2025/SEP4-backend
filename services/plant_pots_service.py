@@ -126,13 +126,11 @@ class PlantPotsService:
         return self.environments_repo.get_pots_by_environment(environment_id)
 
     def delete_plant_pot(self, pot_id: str, env_id: str) -> bool:
-        if(self.user_service.is_user_admin(env_id) == False):
-            raise ValueError("User is not an admin")
-
+        if not self.auth_service.check_user_permissions(user_id, env_id):
+            raise ValueError("User does not have permission to delete pots from this environment")
+        
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
-
-        print("Registered pot - good\n")
 
         # Get the pot from DB first to gather full info (before deletion)
         pot = self.environments_repo.find_pot_by_id(pot_id)
