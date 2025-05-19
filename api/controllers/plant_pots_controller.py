@@ -76,13 +76,16 @@ def get_pots_by_environment(environment_id: str):
 
 
 @router.delete("/environments/{env_id}/pots/{pot_id}")
-def delete_pot(env_id: str, pot_id: str):
+def delete_pot(env_id: str, pot_id: str, Authorization: str = Header(None)):
     print("Received DELETE /pots/{pot_id} with id=", pot_id)
     try:
-        if PlantPotsService().delete_plant_pot(pot_id, env_id):
+        request_user_id = decode_jwtheader(Authorization)
+        if PlantPotsService().delete_plant_pot(pot_id, env_id, request_user_id):
             return JSONResponse(
                 content={"message": "Pot deleted successfully"}, status_code=200
             )
+        else:
+            raise HTTPException(status_code=403, detail="Not authorised")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
