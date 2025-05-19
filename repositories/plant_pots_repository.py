@@ -18,6 +18,8 @@ class PlantPotsRepository:
 
             if not pot_id or not environment_id:
                 raise ValueError("Pot data must include '_id' and 'environment_id'")
+            
+            pot_data["_id"] = ObjectId(pot_id)
 
             # Insert into plant_pots collection
             self.plant_pots_collection.insert_one(pot_data)
