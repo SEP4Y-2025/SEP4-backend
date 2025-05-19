@@ -97,3 +97,15 @@ def delete_environment(environment_id: str):
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
+
+@router.get("/environments", response_class=JSONResponse)
+def get_environments_for_user(Authorization: str = Header(None)):
+    try:
+        user_id = decode_jwtheader(Authorization)
+        service = EnvironmentsService()
+        environments = service.get_environments_by_user(user_id)
+        return JSONResponse(status_code=200, content={"environments": environments})
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
