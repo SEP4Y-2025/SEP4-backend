@@ -79,7 +79,7 @@ def get_pots_by_environment(environment_id: str):
 def delete_pot(env_id: str, pot_id: str):
     print("Received DELETE /pots/{pot_id} with id=", pot_id)
     try:
-        if PlantPotsService().delete_plant_pot(pot_id):
+        if PlantPotsService().delete_plant_pot(pot_id, env_id):
             return JSONResponse(
                 content={"message": "Pot deleted successfully"}, status_code=200
             )

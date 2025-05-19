@@ -12,7 +12,7 @@ from utils.jwt_middleware import decode_jwtheader
 router = APIRouter()
 
 
-@router.put(
+@router.post(
     "/environments/{environment_id}/assistants",
     response_model=UserPermissionResponse,
 )
@@ -20,8 +20,7 @@ def add_user_permission(
     environment_id: str, user_email: str = Query(...), Authorization: str = Header(None)
 ):
     try:
-        request_user_id = decode_jwtheader(Authorization)["id"]
-
+        request_user_id = decode_jwtheader(Authorization)
         service = UsersService()
         user_data = {
             "user_email": user_email,
@@ -62,7 +61,7 @@ def get_user(user_id: str):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
-    except ValueError as e:
+    except ValueError as e: 
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

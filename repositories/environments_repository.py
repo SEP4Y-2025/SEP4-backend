@@ -101,7 +101,7 @@ class EnvironmentsRepository:
             traceback.print_exc()
             return False
 
-    def add_environment(self, environment: dict) -> str:
+    def add_environment(self, environment: dict, request_user_id: str) -> str:
         try:
             result = self.collection.insert_one(environment)
             return str(result.inserted_id)

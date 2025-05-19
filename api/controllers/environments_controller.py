@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse
 from services.environments_service import EnvironmentsService
 from models.environment import AddEnvironmentRequest, AddEnvironmentResponse
@@ -9,6 +9,7 @@ from models.environment import (
     AddEnvironmentRequest,
     AddEnvironmentResponse,
 )
+from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
 
@@ -62,10 +63,12 @@ def get_environment_by_id(environment_id: str):
 
 
 @router.post("/environments", response_model=AddEnvironmentResponse)
-def add_environment(request: AddEnvironmentRequest):
+def add_environment(request: AddEnvironmentRequest, Authorization: str = Header(None)):
     try:
+        request_user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        response = service.add_environment(request)
+        print(request_user_id)
+        response = service.add_environment(request, request_user_id)
         return response
     except ValueError as e:
         raise HTTPException(status_code=400, detail={"message": str(e)})

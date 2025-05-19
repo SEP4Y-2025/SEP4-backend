@@ -12,6 +12,7 @@ from repositories.sensor_readings_repository import SensorReadingsRepository
 from core.mqtt_client import mqtt_client
 import json, time, uuid, queue
 import datetime
+from services.auth_service import AuthService
 
 
 class PlantPotsService:
@@ -20,6 +21,7 @@ class PlantPotsService:
         self.arduinos_repo = ArduinosRepository()
         self.plant_types_repo = PlantTypesRepository()
         self.sensor_readings_repo = SensorReadingsRepository()
+        self.auth_service = AuthService()
 
     def add_plant_pot(
         self, environment_id: str, pot: AddPlantPotRequest
@@ -126,7 +128,10 @@ class PlantPotsService:
     def get_pots_by_environment(self, environment_id: str):
         return self.environments_repo.get_pots_by_environment(environment_id)
 
-    def delete_plant_pot(self, pot_id: str) -> bool:
+    def delete_plant_pot(self, pot_id: str, env_id: str) -> bool:
+        if(self.user_service.is_user_admin(env_id) == False):
+            raise ValueError("User is not an admin")
+
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 
