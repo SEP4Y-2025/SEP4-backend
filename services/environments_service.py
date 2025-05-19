@@ -66,6 +66,5 @@ class EnvironmentsService:
 
         return self.environments_repository.delete_environment(environment_id)
     
-    
     def get_environments_by_user(self, user_id: str):
         return self.user_repository.get_user_environment_ids(user_id)
