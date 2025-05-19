@@ -27,20 +27,21 @@ class SoilHumidityPredictor:
         try:
             self.top_features = top_features
             
-
             X_selected = X[top_features]
             
             self.model.fit(X_selected, y)
             
             importance = self.model.feature_importances_
-            self.feature_importance = dict(zip(top_features, importance))
+            self.feature_importance = {k: float(v) for k, v in zip(top_features, importance)}
             
             logger.info(f"XGBoost model trained with features: {top_features}")
             logger.info(f"Feature importance: {self.feature_importance}")
             
             equation = f"XGBoost model with {self.model.n_estimators} trees, max depth {self.model.max_depth}"
             equation += f"\nTop features: {top_features}"
-            equation += f"\nFeature importance: {json.dumps(self.feature_importance, indent=2)}"
+            
+            feature_importance_serializable = {k: float(v) for k, v in self.feature_importance.items()}
+            equation += f"\nFeature importance: {json.dumps(feature_importance_serializable, indent=2)}"
             
             return equation
         except Exception as e:
@@ -53,16 +54,22 @@ class SoilHumidityPredictor:
         try:
             X_selected = X[self.top_features]
             
-            return self.model.predict(X_selected)
+            prediction = self.model.predict(X_selected)
+            
+            result = np.clip(prediction, 0, 100)
+            if not np.array_equal(prediction, result):
+                logger.warning(f"Prediction values were clipped from {prediction} to {result}")
+            
+            return result
         except Exception as e:
             traceback.print_exc()
             logger.error(f"Error predicting with XGBoost model: {str(e)}")
             if 'temperature' in X.columns and 'air_humidity' in X.columns:
                 temp = X['temperature'].values[0]
                 humidity = X['air_humidity'].values[0]
-                return np.array([220 - (1.0 * temp) + (0.8 * humidity)])
+                return np.array([min(100, max(0, 30 - (0.2 * temp) + (0.3 * humidity)))])
             else:
-                return np.array([200])
+                return np.array([30])
     
     def evaluate(self, X, y_true):
         try:
@@ -99,10 +106,12 @@ class SoilHumidityPredictor:
     
     def save(self, filepath):
         try:
+            feature_importance_serializable = {k: float(v) for k, v in self.feature_importance.items()}
+            
             model_package = {
                 'model': self.model,
                 'top_features': self.top_features,
-                'feature_importance': self.feature_importance
+                'feature_importance': feature_importance_serializable
             }
             
             os.makedirs(os.path.dirname(filepath), exist_ok=True)

@@ -7,6 +7,7 @@ import os
 import datetime
 import logging
 import traceback
+import json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,7 +42,7 @@ class ModelTrainer:
             feature_selector = NeuralFeatureSelector(input_dim=X.shape[1])
             feature_selector.train(X_train, y_train, X_val, y_val)
             
-            top_features = feature_selector.get_top_features(X_test, X.columns, top_n=4)  # Increased to top 4 features
+            top_features = feature_selector.get_top_features(X_test, X.columns, top_n=4)
             logger.info(f"Top features selected: {top_features}")
             
             logger.info("Training XGBoost model with selected features")
@@ -73,6 +74,19 @@ class ModelTrainer:
             
             latest_path = os.path.join(self.model_save_path, "latest.pkl")
             predictor.save(latest_path)
+
+            try:
+                metrics_file = os.path.join(self.model_save_path, "training_metrics.json")
+                with open(metrics_file, 'w') as f:
+                    metrics_dict = {
+                        'train': {k: float(v) for k, v in train_metrics.items()},
+                        'validation': {k: float(v) for k, v in val_metrics.items()},
+                        'test': {k: float(v) for k, v in test_metrics.items()}
+                    }
+                    json.dump(metrics_dict, f, indent=2)
+                logger.info(f"Training metrics saved to {metrics_file}")
+            except Exception as e:
+                logger.warning(f"Failed to save metrics file: {str(e)}")
             
             results = {
                 'timestamp': timestamp,
@@ -90,4 +104,15 @@ class ModelTrainer:
 
     def get_metrics(self):
         """Return the latest training metrics"""
+        if self.training_metrics is None:
+            try:
+                metrics_file = os.path.join(self.model_save_path, "training_metrics.json")
+                if os.path.exists(metrics_file):
+                    with open(metrics_file, 'r') as f:
+                        metrics = json.load(f)
+                    logger.info(f"Loaded metrics from {metrics_file}")
+                    return metrics
+            except Exception as e:
+                logger.warning(f"Could not load metrics from file: {str(e)}")
+                
         return self.training_metrics

@@ -45,7 +45,7 @@ class DataProcessor:
                 (data['hour'] >= 22) | (data['hour'] < 6)
             ]
             categories = ['morning', 'afternoon', 'evening', 'night']
-            data['day_part'] = np.select(conditions, categories)
+            data['day_part'] = np.select(conditions, categories, default='unknown')
             
             day_part_dummies = pd.get_dummies(data['day_part'], prefix='day_part')
             data = pd.concat([data, day_part_dummies], axis=1)
