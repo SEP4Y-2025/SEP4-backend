@@ -3,6 +3,7 @@ from typing import Optional
 import jwt
 from passlib.context import CryptContext
 from repositories.auth_repository import AuthRepository
+from repositories.users_repository import UsersRepository
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -16,6 +17,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 class AuthService:
     def __init__(self):
         self.auth_repository = AuthRepository()
+        self.users_repository = UsersRepository()
 
     def verify_password(self, plain_password, hashed_password):
         return pwd_context.verify(plain_password, hashed_password)
@@ -91,5 +93,10 @@ class AuthService:
         new_hashed = self.get_password_hash(new_password)
         return self.auth_repository.update_user_password(email, new_hashed)
 
-    # def find_user_by_email(self, email: str):
-    #     return self.auth_repository.find_user_by_email(email)
+    def check_user_permissions(self, user_id: str, environment_id: str):
+        role = self.users_repository.get_user_role(user_id, environment_id)
+        if not role:
+            return False
+        if role != "Owner":
+            return False
+        return True

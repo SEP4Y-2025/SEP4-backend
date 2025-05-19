@@ -1,11 +1,13 @@
 from repositories.users_repository import UsersRepository
 from services.environments_service import EnvironmentsService
+from services.auth_service import AuthService
 
 
 class UsersService:
     def __init__(self):
         self.repository = UsersRepository()
         self.env_service = EnvironmentsService()
+        self.auth_service = AuthService()
 
     def get_all_users(self):
         users_response = self.repository.get_all_users()
@@ -15,11 +17,16 @@ class UsersService:
 
         return users_response
 
-    def add_permission(self, environment_id: str, user: dict):
+    def add_permission(self, environment_id: str, user: dict, request_user_id: str):
         if not user.get("user_email"):
             raise ValueError("Invalid user data: 'user_email' is required")
-
-        return self.repository.add_permission(environment_id, user)
+        if (
+            self.auth_service.check_user_permissions(request_user_id, environment_id)
+            == True
+        ):
+            return self.repository.add_permission(environment_id, user)
+        else:
+            raise ValueError("User does not have permission to add user")
 
     def get_user_environments(self, user_id: str):
         return self.repository.get_user_environment_ids(user_id)

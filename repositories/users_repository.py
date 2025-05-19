@@ -144,3 +144,22 @@ class UsersRepository:
         except Exception as e:
             print(f"Error fetching user permissions: {e}")
             raise
+
+    def get_user_role(self, user_id: str, environment_id: str):
+        try:
+            user = self.user_collection.find_one(
+                {"_id": ObjectId(user_id)},
+                {"environments.environment_id": 1, "environments.role": 1},
+            )
+            if not user:
+                raise ValueError("User not found")
+
+            environments = user.get("environments", [])
+            for env in environments:
+                if str(env["environment_id"]) == environment_id:
+                    return env["role"]
+
+            raise ValueError("User does not have access to this environment")
+        except Exception as e:
+            print(f"Error in get_user_role: {e}")
+            raise
