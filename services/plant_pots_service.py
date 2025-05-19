@@ -1,4 +1,3 @@
-# service/pots_service.py
 
 from models.plant_pot import (
     AddPlantPotRequest,
@@ -24,17 +23,15 @@ class PlantPotsService:
         self.auth_service = AuthService()
 
     def add_plant_pot(
-        self, environment_id: str, pot: AddPlantPotRequest
-    ) -> AddPlantPotResponse:
-
+        self, environment_id: str, pot: AddPlantPotRequest, user_id: str) -> AddPlantPotResponse:
+        
+        if not self.auth_service.check_user_permissions(user_id, environment_id):
+            raise ValueError("User does not have permission to add a pot to this environment")  
         if pot.plant_pot_label.strip() == "":
             raise ValueError("Invalid plant pot label")
 
         if not self.arduinos_repo.is_registered(pot.pot_id):
             raise ValueError("Unknown or unregistered Arduino")
-
-        print("Registered pot - good\n")
-
         # Get full plant type details from DB
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot.plant_type_id)
         if not plant_type:
@@ -73,6 +70,7 @@ class PlantPotsService:
             "water_tank_capacity": 0,
             "water_level": 0,
             "measured_at": formatted_time,
+            "created_by": user_id,  
         }
 
         self.environments_repo.insert_pot(environment_id, pot_doc)
@@ -88,6 +86,62 @@ class PlantPotsService:
             water_dosage=plant_type["water_dosage"],
             environment_id=pot_doc["environment_id"],
         )
+
+def add_plant_pot(
+    self, environment_id: str, pot: AddPlantPotRequest, user_id: str
+) -> AddPlantPotResponse:
+    # Optional permission check
+    # if not self.auth_service.check_user_permissions(user_id, environment_id):
+    #     raise ValueError("User does not have permission to add a pot to this environment")
+
+    if pot.plant_pot_label.strip() == "":
+        raise ValueError("Invalid plant pot label")
+
+    if not self.arduinos_repo.is_registered(pot.pot_id):
+        raise ValueError("Unknown or unregistered Arduino")
+
+    plant_type = self.plant_types_repo.get_plant_type_by_id(pot.plant_type_id)
+    if not plant_type:
+        raise ValueError("Invalid plant type ID")
+
+    payload = {
+        "watering_frequency": plant_type["watering_frequency"],
+        "water_dosage": plant_type["water_dosage"],
+    }
+    print("Sending command to MQTT broker:", payload)
+
+    timestamp = time.time()
+    dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
+    formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    pot_doc = {
+        "pot_id": pot.pot_id,
+        "label": pot.plant_pot_label,
+        "plant_type_id": pot.plant_type_id,
+        "environment_id": environment_id,
+        "soil_humidity": 0,
+        "air_humidity": 0,
+        "temperature": 0,
+        "light_intensity": 0,
+        "water_tank_capacity": 0,
+        "water_level": 0,
+        "measured_at": formatted_time,
+        "created_by": user_id,  # <--- Track who added the pot
+    }
+
+    self.environments_repo.insert_pot(environment_id, pot_doc)
+    self.arduinos_repo.mark_active(pot.pot_id)
+
+    return AddPlantPotResponse(
+        message="Pot added successfully",
+        pot_id=pot.pot_id,
+        plant_pot_label=pot.plant_pot_label,
+        plant_type_id=pot.plant_type_id,
+        plant_type_name=plant_type["name"],
+        watering_frequency=plant_type["watering_frequency"],
+        water_dosage=plant_type["water_dosage"],
+        environment_id=pot_doc["environment_id"],
+    )
 
     def get_plant_pot_by_id(self, env_id: str, pot_id: str) -> GetPlantPotResponse:
         payload = {}

@@ -1,23 +1,23 @@
 # api/endpoints/pot.py
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse
 from services.plant_pots_service import PlantPotsService
 from models.plant_pot import AddPlantPotRequest, AddPlantPotResponse
 from bson import ObjectId
+from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
 
 
 @router.post("/environments/{env_id}/pots", response_model=AddPlantPotResponse)
-def add_plant_pot(env_id: str, pot: AddPlantPotRequest):
-    print("Received POST /pots with:", pot.model_dump())
+def add_plant_pot(env_id: str, pot: AddPlantPotRequest, Authorization: str = Header(None)):
     try:
-        return PlantPotsService().add_plant_pot(env_id, pot)
+        request_user_id = decode_jwtheader(Authorization)
+        return PlantPotsService().add_plant_pot(env_id, pot, request_user_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Handle unexpected errors
         raise HTTPException(status_code=500, detail=str(e))
 
 
