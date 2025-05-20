@@ -22,9 +22,9 @@ class EnvironmentsService:
     def get_environment_by_id(self, environment_id: str):
         return self.environments_repository.get_environment_by_id(environment_id)
 
-    def add_environment(self, request: AddEnvironmentRequest, request_user_id: str) -> AddEnvironmentResponse:
-        if self.environments_repository.environment_name_exists(request_user_id, request.name):
-            raise ValueError("Environment name already exists for this user.")
+    def add_environment(
+        self, request: AddEnvironmentRequest, request_user_id: str
+    ) -> AddEnvironmentResponse:
         environment_dict = request.dict()
         environment_dict.setdefault("owner_id", request_user_id)
         environment_dict.setdefault("window_state", "closed")
@@ -35,7 +35,9 @@ class EnvironmentsService:
             }
         ]
         environment_dict.setdefault("plant_pots", [])
-        inserted_id = self.environments_repository.add_environment(environment_dict, request_user_id)
+        inserted_id = self.environments_repository.add_environment(
+            environment_dict, request_user_id
+        )
         self.user_repository.add_environment_to_user(
             request_user_id,
             {
@@ -49,7 +51,7 @@ class EnvironmentsService:
             name=request.name,
         )
 
-    def delete_environment(self, environment_id: str, user_id : str) -> bool:
+    def delete_environment(self, environment_id: str, user_id: str) -> bool:
         env = self.environments_repository.get_environment_by_id(environment_id)
         if not env:
             return False
@@ -62,9 +64,12 @@ class EnvironmentsService:
                     self.plant_pots_service.delete_plant_pot(pot_id)
                 except Exception as e:
                     print(f"Failed to delete pot {pot_id}: {e}")
-            
+
         self.user_repository.remove_environment_from_user(
             env["owner_id"], environment_id
         )
 
         return self.environments_repository.delete_environment(environment_id)
+
+    def get_environments_by_user(self, user_id: str):
+        return self.user_repository.get_user_environment_ids(user_id)

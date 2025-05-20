@@ -20,7 +20,10 @@ class UsersService:
     def add_permission(self, environment_id: str, user: dict, request_user_id: str):
         if not user.get("user_email"):
             raise ValueError("Invalid user data: 'user_email' is required")
-        if (self.auth_service.check_user_permissions(request_user_id, environment_id)== True):
+        if (
+            self.auth_service.check_user_permissions(request_user_id, environment_id)
+            == True
+        ):
             return self.repository.add_permission(environment_id, user)
         else:
             raise ValueError("User does not have permission to add user")

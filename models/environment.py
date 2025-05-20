@@ -8,6 +8,7 @@ class AddEnvironmentRequest(BaseModel):
     access_control: list = []
     plant_pots: list = []
 
+
 class AddEnvironmentResponse(BaseModel):
     message: str
     environment_id: str

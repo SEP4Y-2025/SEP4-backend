@@ -1,4 +1,3 @@
-
 from models.plant_pot import (
     AddPlantPotRequest,
     AddPlantPotResponse,
@@ -26,7 +25,9 @@ class PlantPotsService:
         self, environment_id: str, pot: AddPlantPotRequest, user_id: str
     ) -> AddPlantPotResponse:
         if not self.auth_service.check_user_permissions(user_id, environment_id):
-            raise ValueError("User does not have permission to add pots to this environment")
+            raise ValueError(
+                "User does not have permission to add pots to this environment"
+            )
         if pot.plant_pot_label.strip() == "":
             raise ValueError("Invalid plant pot label")
         if not self.arduinos_repo.is_registered(pot.pot_id):
@@ -86,23 +87,28 @@ class PlantPotsService:
             environment_id=pot_doc["environment_id"],
         )
 
-    def get_plant_pot_by_id(self, env_id: str, pot_id: str, user_id: str) -> GetPlantPotResponse:
+    def get_plant_pot_by_id(
+        self, env_id: str, pot_id: str, user_id: str
+    ) -> GetPlantPotResponse:
         env = self.environments_repo.get_environment_by_id(env_id)
         if not env:
             raise ValueError("Environment not found")
-        
+
         allowed = False
         for entry in env.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
                 allowed = True
                 break
         if not allowed:
-            raise ValueError("User does not have permission to view this pot")     
-        
+            raise ValueError("User does not have permission to view this pot")
+
         pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
-      
+
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
         if not plant_type:
             raise ValueError("Invalid plant type ID")
@@ -128,22 +134,29 @@ class PlantPotsService:
         env = self.environments_repo.get_environment_by_id(environment_id)
         if not env:
             raise ValueError("Environment not found")
-        
+
         allowed = False
         for entry in env.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
                 allowed = True
                 break
-        
+
         if not allowed:
-            raise ValueError("User does not have permission to view pots in this environment")
-        
+            raise ValueError(
+                "User does not have permission to view pots in this environment"
+            )
+
         return self.environments_repo.get_pots_by_environment(environment_id)
 
     def delete_plant_pot(self, pot_id: str, env_id: str, user_id: str) -> bool:
         if not self.auth_service.check_user_permissions(user_id, env_id):
-            raise ValueError("User does not have permission to delete pots from this environment")
-        
+            raise ValueError(
+                "User does not have permission to delete pots from this environment"
+            )
+
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 

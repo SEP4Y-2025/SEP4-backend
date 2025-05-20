@@ -62,15 +62,18 @@ class UsersRepository:
             for env in environments:
                 if "environment_id" in env and "role" in env:
                     env_doc = self.env_collection.find_one(
-                        {"_id": ObjectId(env["environment_id"])},
-                        {"name": 1}
+                        {"_id": ObjectId(env["environment_id"])}, {"name": 1}
                     )
-                    env_name = env_doc["name"] if env_doc and "name" in env_doc else None
-                    environment_data.append({
-                        "environment_id": str(env["environment_id"]),
-                        "environment_name": env_name,
-                        "role": env["role"]
-                    })
+                    env_name = (
+                        env_doc["name"] if env_doc and "name" in env_doc else None
+                    )
+                    environment_data.append(
+                        {
+                            "environment_id": str(env["environment_id"]),
+                            "environment_name": env_name,
+                            "role": env["role"],
+                        }
+                    )
 
             return environment_data
         except Exception as e:
@@ -174,7 +177,7 @@ class UsersRepository:
         except Exception as e:
             print(f"Error in get_user_role: {e}")
             raise
-    
+
     def add_environment_to_user(self, user_id: str, environment: dict):
         try:
             self.user_collection.update_one(
