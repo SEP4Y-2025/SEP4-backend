@@ -18,12 +18,17 @@ class PlantTypesService:
 
         allowed = False
         for entry in environment.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
                 allowed = True
                 break
 
         if not allowed:
-            raise ValueError("User does not have permission to view plant types in this environment")
+            raise ValueError(
+                "User does not have permission to view plant types in this environment"
+            )
 
         plant_type_response = self.repository.get_plant_types_by_environment(
             environment_id

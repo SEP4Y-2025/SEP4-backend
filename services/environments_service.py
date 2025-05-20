@@ -24,10 +24,12 @@ class EnvironmentsService:
         if not environment:
             return None
 
-    
         allowed = False
         for entry in environment.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
                 allowed = True
                 break
 
@@ -36,8 +38,12 @@ class EnvironmentsService:
 
         return environment
 
-    def add_environment(self, request: AddEnvironmentRequest, request_user_id: str) -> AddEnvironmentResponse:
-        if self.environments_repository.environment_name_exists(request_user_id, request.name):
+    def add_environment(
+        self, request: AddEnvironmentRequest, request_user_id: str
+    ) -> AddEnvironmentResponse:
+        if self.environments_repository.environment_name_exists(
+            request_user_id, request.name
+        ):
             raise ValueError("Environment name already exists for this user.")
         environment_dict = request.dict()
         environment_dict.setdefault("owner_id", request_user_id)
@@ -49,7 +55,9 @@ class EnvironmentsService:
             }
         ]
         environment_dict.setdefault("plant_pots", [])
-        inserted_id = self.environments_repository.add_environment(environment_dict, request_user_id)
+        inserted_id = self.environments_repository.add_environment(
+            environment_dict, request_user_id
+        )
         self.user_repository.add_environment_to_user(
             request_user_id,
             {
@@ -75,7 +83,7 @@ class EnvironmentsService:
                     self.plant_pots_service.delete_plant_pot(pot_id)
                 except Exception as e:
                     print(f"Failed to delete pot {pot_id}: {e}")
-            
+
         self.user_repository.remove_environment_from_user(
             environment["owner_id"], environment_id
         )

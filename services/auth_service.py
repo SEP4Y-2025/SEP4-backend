@@ -6,7 +6,6 @@ from repositories.auth_repository import AuthRepository
 from repositories.users_repository import UsersRepository
 
 
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

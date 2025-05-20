@@ -61,7 +61,7 @@ def get_user(user_id: str):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         return user
-    except ValueError as e: 
+    except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

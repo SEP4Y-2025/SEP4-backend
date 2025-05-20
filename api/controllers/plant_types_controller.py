@@ -10,7 +10,9 @@ router = APIRouter()
 
 
 @router.get("/environments/{environment_id}/plant_types")
-def get_plant_types_by_environment(environment_id: str, Authorization: str = Header(None)):
+def get_plant_types_by_environment(
+    environment_id: str, Authorization: str = Header(None)
+):
     try:
         user_id = decode_jwtheader(Authorization)
         service = PlantTypesService()

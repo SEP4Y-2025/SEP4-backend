@@ -10,7 +10,9 @@ router = APIRouter()
 
 
 @router.post("/environments/{env_id}/pots", response_model=AddPlantPotResponse)
-def add_plant_pot(env_id: str, pot: AddPlantPotRequest, Authorization: str = Header(None)):
+def add_plant_pot(
+    env_id: str, pot: AddPlantPotRequest, Authorization: str = Header(None)
+):
     try:
         request_user_id = decode_jwtheader(Authorization)
         return PlantPotsService().add_plant_pot(env_id, pot, request_user_id)
@@ -62,7 +64,7 @@ def get_pots_by_environment(environment_id: str, Authorization: str = Header(Non
 
         user_id = decode_jwtheader(Authorization)
         service = PlantPotsService()
-        pots = service.get_pots_by_environment(environment_id,user_id)
+        pots = service.get_pots_by_environment(environment_id, user_id)
 
         if pots is None:
             raise HTTPException(status_code=500, detail="Internal server error")
