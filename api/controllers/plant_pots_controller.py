@@ -40,9 +40,10 @@ def get_logs():
 
 
 @router.get("/environments/{environment_id}/pots/{pot_id}")
-def get_plant_pot(environment_id: str, pot_id: str):
+def get_plant_pot(environment_id: str, pot_id: str, Authorization: str = Header(None)):
     try:
-        pot = PlantPotsService().get_plant_pot_by_id(environment_id, pot_id)
+        user_id = decode_jwtheader(Authorization)
+        pot = PlantPotsService().get_plant_pot_by_id(environment_id, pot_id, user_id)
         if not pot:
             raise HTTPException(status_code=404, detail="Plant pot not found")
         return {"pot": pot}

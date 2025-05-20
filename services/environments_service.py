@@ -71,12 +71,13 @@ class EnvironmentsService:
             name=request.name,
         )
 
-    def delete_environment(self, environment_id: str) -> bool:
-        environment = self.environments_repository.get_environment_by_id(environment_id)
-        if not environment:
-            raise ValueError(f"Environment with ID {environment_id} not found")
-
-        for pot in environment.get("plant_pots", []):
+    def delete_environment(self, environment_id: str, user_id: str) -> bool:
+        env = self.environments_repository.get_environment_by_id(environment_id)
+        if not env:
+            return False
+        if str(env.get("owner_id")) != str(user_id):
+            raise ValueError("User does not have permission to delete this environment")
+        for pot in env.get("plant_pots", []):
             pot_id = pot.get("pot_id")
             if pot_id:
                 try:
@@ -85,7 +86,10 @@ class EnvironmentsService:
                     print(f"Failed to delete pot {pot_id}: {e}")
 
         self.user_repository.remove_environment_from_user(
-            environment["owner_id"], environment_id
+            env["owner_id"], environment_id
         )
 
         return self.environments_repository.delete_environment(environment_id)
+
+    def get_environments_by_user(self, user_id: str):
+        return self.user_repository.get_user_environment_ids(user_id)

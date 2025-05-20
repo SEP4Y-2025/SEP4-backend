@@ -87,14 +87,29 @@ class PlantPotsService:
             environment_id=pot_doc["environment_id"],
         )
 
-    def get_plant_pot_by_id(self, env_id: str, pot_id: str) -> GetPlantPotResponse:
-        payload = {}
+    def get_plant_pot_by_id(
+        self, env_id: str, pot_id: str, user_id: str
+    ) -> GetPlantPotResponse:
+        env = self.environments_repo.get_environment_by_id(env_id)
+        if not env:
+            raise ValueError("Environment not found")
+
+        allowed = False
+        for entry in env.get("access_control", []):
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
+                allowed = True
+                break
+        if not allowed:
+            raise ValueError("User does not have permission to view this pot")
+
         pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
 
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
-
         if not plant_type:
             raise ValueError("Invalid plant type ID")
 
