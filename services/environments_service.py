@@ -19,12 +19,32 @@ class EnvironmentsService:
         )
         return result
 
-    def get_environment_by_id(self, environment_id: str):
-        return self.environments_repository.get_environment_by_id(environment_id)
+    def get_environment_by_id(self, environment_id: str, user_id: str):
+        environment = self.environments_repository.get_environment_by_id(environment_id)
+        if not environment:
+            return None
+
+        allowed = False
+        for entry in environment.get("access_control", []):
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
+                "Owner",
+                "Assistant",
+            ]:
+                allowed = True
+                break
+
+        if not allowed:
+            raise ValueError("User does not have permission to view this environment")
+
+        return environment
 
     def add_environment(
         self, request: AddEnvironmentRequest, request_user_id: str
     ) -> AddEnvironmentResponse:
+        if self.environments_repository.environment_name_exists(
+            request_user_id, request.name
+        ):
+            raise ValueError("Environment name already exists for this user.")
         environment_dict = request.dict()
         environment_dict.setdefault("owner_id", request_user_id)
         environment_dict.setdefault("window_state", "closed")
