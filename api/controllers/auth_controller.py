@@ -69,7 +69,9 @@ async def register(user_data: RegisterRequest):
 
 
 @router.put("/auth/password")
-async def update_password(data: PasswordUpdateRequest, Authorization: str = Header(None)):
+async def update_password(
+    data: PasswordUpdateRequest, Authorization: str = Header(None)
+):
     try:
         user_id = decode_jwtheader(Authorization)
         if not data.new_password or not data.old_password.strip():
@@ -83,6 +85,7 @@ async def update_password(data: PasswordUpdateRequest, Authorization: str = Head
         return {"message": "Password changed successfully"}
     except Exception as e:
         import traceback
+
         print(f"Change password error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

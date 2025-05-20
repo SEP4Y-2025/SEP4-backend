@@ -51,7 +51,7 @@ class EnvironmentsService:
             name=request.name,
         )
 
-    def delete_environment(self, environment_id: str, user_id : str) -> bool:
+    def delete_environment(self, environment_id: str, user_id: str) -> bool:
         env = self.environments_repository.get_environment_by_id(environment_id)
         if not env:
             return False

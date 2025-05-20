@@ -86,17 +86,17 @@ def delete_environment(environment_id: str, Authorization: str = Header(None)):
         deleted = service.delete_environment(environment_id, request_user_id)
         if not deleted:
             return JSONResponse(
-                status_code=403, content={"message": "Not authorized to delete this environment"}
+                status_code=403,
+                content={"message": "Not authorized to delete this environment"},
             )
         return JSONResponse(
             status_code=200, content={"message": "Environment deleted successfully"}
         )
     except ValueError as e:
-        return JSONResponse(
-            status_code=403, content={"message": str(e)}
-        )
+        return JSONResponse(status_code=403, content={"message": str(e)})
     except Exception as e:
         import traceback
+
         traceback.print_exc()
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
