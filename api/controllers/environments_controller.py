@@ -98,6 +98,7 @@ def delete_environment(environment_id: str):
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
 
+
 @router.get("/environments", response_class=JSONResponse)
 def get_environments_for_user(Authorization: str = Header(None)):
     try:

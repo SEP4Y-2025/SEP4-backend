@@ -129,7 +129,7 @@ class PlantPotsService:
         return self.environments_repo.get_pots_by_environment(environment_id)
 
     def delete_plant_pot(self, pot_id: str, env_id: str) -> bool:
-        if(self.user_service.is_user_admin(env_id) == False):
+        if self.user_service.is_user_admin(env_id) == False:
             raise ValueError("User is not an admin")
 
         if not self.arduinos_repo.is_registered(pot_id):
