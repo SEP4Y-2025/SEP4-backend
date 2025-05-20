@@ -20,7 +20,6 @@ class TokenResponse(BaseModel):
     user_id: str
 
 
-class ChangePasswordRequest(BaseModel):
-    email: str
+class PasswordUpdateRequest(BaseModel):
     old_password: str
     new_password: str

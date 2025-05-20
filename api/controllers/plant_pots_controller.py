@@ -10,14 +10,13 @@ router = APIRouter()
 
 
 @router.post("/environments/{env_id}/pots", response_model=AddPlantPotResponse)
-def add_plant_pot(env_id: str, pot: AddPlantPotRequest):
-    print("Received POST /pots with:", pot.model_dump())
+def add_plant_pot(env_id: str, pot: AddPlantPotRequest, Authorization: str = Header(None)):
     try:
-        return PlantPotsService().add_plant_pot(env_id, pot)
+        request_user_id = decode_jwtheader(Authorization)
+        return PlantPotsService().add_plant_pot(env_id, pot, request_user_id)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Handle unexpected errors
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -77,13 +76,16 @@ def get_pots_by_environment(environment_id: str, Authorization: str = Header(Non
 
 
 @router.delete("/environments/{env_id}/pots/{pot_id}")
-def delete_pot(env_id: str, pot_id: str):
+def delete_pot(env_id: str, pot_id: str, Authorization: str = Header(None)):
     print("Received DELETE /pots/{pot_id} with id=", pot_id)
     try:
-        if PlantPotsService().delete_plant_pot(pot_id, env_id):
+        request_user_id = decode_jwtheader(Authorization)
+        if PlantPotsService().delete_plant_pot(pot_id, env_id, request_user_id):
             return JSONResponse(
                 content={"message": "Pot deleted successfully"}, status_code=200
             )
+        else:
+            raise HTTPException(status_code=403, detail="Not authorised")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

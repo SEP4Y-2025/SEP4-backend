@@ -4,9 +4,7 @@ from bson import ObjectId
 from utils.helper import convert_object_ids
 
 
-# How does this work?
-# The environment contains multiple plant pots, but the PlantPotsRepository class is responsible for managing plant pots in the database.
-# It provides methods to insert, update, delete, and retrieve plant pots and their associated environments.
+
 class PlantPotsRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
@@ -16,10 +14,12 @@ class PlantPotsRepository:
     def insert_pot(self, pot_data: dict):
         try:
             environment_id = pot_data.get("environment_id")
-            pot_id = pot_data.get("_id")  # Must be a string
+            pot_id = pot_data.get("pot_id")  # Must be a string
 
             if not pot_id or not environment_id:
                 raise ValueError("Pot data must include '_id' and 'environment_id'")
+            
+            pot_data["_id"] = ObjectId(pot_id)
 
             # Insert into plant_pots collection
             self.plant_pots_collection.insert_one(pot_data)
