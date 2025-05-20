@@ -39,10 +39,11 @@ def get_environments():
 
 
 @router.get("/environments/{environment_id}", response_class=JSONResponse)
-def get_environment_by_id(environment_id: str):
+def get_environment_by_id(environment_id: str, Authorization: str = Header(None)):
     try:
+        user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        environment = service.get_environment_by_id(environment_id)
+        environment = service.get_environment_by_id(environment_id, user_id)
 
         if not environment:
             return JSONResponse(
