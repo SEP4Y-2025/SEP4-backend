@@ -171,6 +171,7 @@ class UsersRepository:
                 print(env["environment_id"])
                 print(environment_id)
                 if str(env["environment_id"]) == environment_id:
+                    print(f"User role: {env['role']}")
                     return env["role"]
 
             raise ValueError("User does not have access to this environment")

@@ -14,6 +14,7 @@ def get_plant_types_by_environment(
     environment_id: str, Authorization: str = Header(None)
 ):
     try:
+        print(Authorization)
         user_id = decode_jwtheader(Authorization)
         service = PlantTypesService()
         plantTypes = service.get_all_plant_types(environment_id, user_id)

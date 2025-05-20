@@ -24,19 +24,16 @@ class EnvironmentsService:
         if not environment:
             return None
 
-        allowed = False
+        # Owner check
+        if str(environment.get("owner_id")) == str(user_id):
+            return environment
+
+        # Plant Assistant check
         for entry in environment.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
-                "Owner",
-                "Assistant",
-            ]:
-                allowed = True
-                break
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") == "Plant Assistant":
+                return environment
 
-        if not allowed:
-            raise ValueError("User does not have permission to view this environment")
-
-        return environment
+        raise ValueError("User does not have permission to view this environment")
 
     def add_environment(
         self, request: AddEnvironmentRequest, request_user_id: str
@@ -46,13 +43,9 @@ class EnvironmentsService:
         ):
             raise ValueError("Environment name already exists for this user.")
         environment_dict = request.dict()
-        environment_dict.setdefault("owner_id", request_user_id)
+        environment_dict.setdefault("owner_id", ObjectId(request_user_id))
         environment_dict.setdefault("window_state", "closed")
         environment_dict["access_control"] = [
-            {
-                "user_id": ObjectId(request_user_id),
-                "role": "Owner",
-            }
         ]
         environment_dict.setdefault("plant_pots", [])
         inserted_id = self.environments_repository.add_environment(

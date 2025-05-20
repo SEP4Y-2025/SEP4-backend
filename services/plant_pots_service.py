@@ -63,13 +63,15 @@ class PlantPotsService:
             "label": pot.plant_pot_label,
             "plant_type_id": pot.plant_type_id,
             "environment_id": environment_id,
-            "soil_humidity": 0,
-            "air_humidity": 0,
-            "temperature": 0,
-            "light_intensity": 0,
-            "water_tank_capacity": 0,
-            "water_level": 0,
-            "measured_at": formatted_time,
+            "state": {
+                "soil_humidity": 0,
+                "air_humidity": 0,
+                "temperature": 0,
+                "light_intensity": 0,
+                "water_tank_capacity": 0,
+                "water_level": 0,
+                "measured_at": formatted_time,
+            },
             "created_by": user_id,
         }
 
@@ -90,22 +92,9 @@ class PlantPotsService:
     def get_plant_pot_by_id(
         self, env_id: str, pot_id: str, user_id: str
     ) -> GetPlantPotResponse:
-        env = self.environments_repo.get_environment_by_id(env_id)
-        if not env:
-            raise ValueError("Environment not found")
-
-        allowed = False
-        for entry in env.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
-                "Owner",
-                "Assistant",
-            ]:
-                allowed = True
-                break
-        if not allowed:
-            raise ValueError("User does not have permission to view this pot")
-
-        pot = self.environments_repo.find_pot_by_id(pot_id)
+        if self.auth_service.check_user_permissions(user_id, env_id):
+            print("yay")
+            pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
 
@@ -135,21 +124,10 @@ class PlantPotsService:
         if not env:
             raise ValueError("Environment not found")
 
-        allowed = False
-        for entry in env.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in [
-                "Owner",
-                "Assistant",
-            ]:
-                allowed = True
-                break
-
-        if not allowed:
-            raise ValueError(
-                "User does not have permission to view pots in this environment"
-            )
-
-        return self.environments_repo.get_pots_by_environment(environment_id)
+        if self.auth_service.check_user_permissions(user_id, environment_id):
+            return self.environments_repo.get_pots_by_environment(environment_id)
+        else:
+            raise ValueError("User does not have permission to view this environment")
 
     def delete_plant_pot(self, pot_id: str, env_id: str, user_id: str) -> bool:
         if not self.auth_service.check_user_permissions(user_id, env_id):

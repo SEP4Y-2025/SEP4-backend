@@ -96,8 +96,6 @@ class AuthService:
 
     def check_user_permissions(self, user_id: str, environment_id: str):
         role = self.users_repository.get_user_role(user_id, environment_id)
-        if not role:
-            return False
-        if role != "Owner":
-            return False
-        return True
+        if role == "Owner" or role == "Plant Assistant":
+            return True
+        return False
