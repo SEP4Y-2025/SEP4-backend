@@ -1,5 +1,4 @@
 # api/endpoints/pot.py
-
 from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse
 from services.plant_pots_service import PlantPotsService
@@ -56,13 +55,14 @@ def get_plant_pot(environment_id: str, pot_id: str):
 
 
 @router.get("/environments/{environment_id}/pots")
-def get_pots_by_environment(environment_id: str):
+def get_pots_by_environment(environment_id: str, Authorization: str = Header(None)):
     try:
         if not ObjectId.is_valid(environment_id):
             raise HTTPException(status_code=400, detail="Invalid environment ID")
 
+        user_id = decode_jwtheader(Authorization)
         service = PlantPotsService()
-        pots = service.get_pots_by_environment(environment_id)
+        pots = service.get_pots_by_environment(environment_id,user_id)
 
         if pots is None:
             raise HTTPException(status_code=500, detail="Internal server error")

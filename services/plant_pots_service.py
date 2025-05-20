@@ -114,7 +114,20 @@ class PlantPotsService:
             measured_at=pot["state"]["measured_at"],
         )
 
-    def get_pots_by_environment(self, environment_id: str):
+    def get_pots_by_environment(self, environment_id: str, user_id: str):
+        env = self.environments_repo.get_environment_by_id(environment_id)
+        if not env:
+            raise ValueError("Environment not found")
+        
+        allowed = False
+        for entry in env.get("access_control", []):
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+                allowed = True
+                break
+        
+        if not allowed:
+            raise ValueError("User does not have permission to view pots in this environment")
+        
         return self.environments_repo.get_pots_by_environment(environment_id)
 
     def delete_plant_pot(self, pot_id: str, env_id: str, user_id: str) -> bool:
