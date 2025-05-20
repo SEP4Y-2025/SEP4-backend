@@ -1,6 +1,7 @@
 # service/plant_types_service.py
 
 from repositories.plant_types_repository import PlantTypesRepository
+from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
 
 
@@ -8,8 +9,22 @@ class PlantTypesService:
     def __init__(self):
         self.repository = PlantTypesRepository()
         self.arduinos = ArduinosRepository()
+        self.environments_repo = EnvironmentsRepository()
 
-    def get_all_plant_types(self, environment_id: str):
+    def get_all_plant_types(self, environment_id: str, user_id: str):
+        environment = self.environments_repo.get_environment_by_id(environment_id)
+        if not environment:
+            raise ValueError(f"Environment ID {environment_id} does not exist")
+
+        allowed = False
+        for entry in environment.get("access_control", []):
+            if str(entry.get("user_id")) == str(user_id) and entry.get("role") in ["Owner", "Assistant"]:
+                allowed = True
+                break
+
+        if not allowed:
+            raise ValueError("User does not have permission to view plant types in this environment")
+
         plant_type_response = self.repository.get_plant_types_by_environment(
             environment_id
         )

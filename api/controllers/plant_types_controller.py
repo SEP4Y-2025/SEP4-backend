@@ -1,18 +1,20 @@
 # api/endpoints/plant_types.py
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from services.plant_types_service import PlantTypesService
 
 from pydantic import BaseModel
+from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
 
 
 @router.get("/environments/{environment_id}/plant_types")
-def get_plant_types_by_environment(environment_id: str):
+def get_plant_types_by_environment(environment_id: str, Authorization: str = Header(None)):
     try:
+        user_id = decode_jwtheader(Authorization)
         service = PlantTypesService()
-        plantTypes = service.get_all_plant_types(environment_id)
+        plantTypes = service.get_all_plant_types(environment_id, user_id)
         return {"PlantTypes": plantTypes}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
