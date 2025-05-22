@@ -5,6 +5,7 @@ from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
 from services.auth_service import AuthService
 
+
 class PlantTypesService:
     def __init__(self):
         self.repository = PlantTypesRepository()
@@ -15,7 +16,7 @@ class PlantTypesService:
     def get_all_plant_types(self, environment_id: str, user_id: str):
         allowed = False
 
-        if(self.auth_service.check_user_permissions(user_id, environment_id)):
+        if self.auth_service.check_user_permissions(user_id, environment_id):
             allowed = True
             return self.repository.get_plant_types_by_environment(environment_id)
 

@@ -30,7 +30,10 @@ class EnvironmentsService:
 
         # Plant Assistant check
         for entry in environment.get("access_control", []):
-            if str(entry.get("user_id")) == str(user_id) and entry.get("role") == "Plant Assistant":
+            if (
+                str(entry.get("user_id")) == str(user_id)
+                and entry.get("role") == "Plant Assistant"
+            ):
                 return environment
 
         raise ValueError("User does not have permission to view this environment")
@@ -45,8 +48,7 @@ class EnvironmentsService:
         environment_dict = request.dict()
         environment_dict.setdefault("owner_id", ObjectId(request_user_id))
         environment_dict.setdefault("window_state", "closed")
-        environment_dict["access_control"] = [
-        ]
+        environment_dict["access_control"] = []
         environment_dict.setdefault("plant_pots", [])
         inserted_id = self.environments_repository.add_environment(
             environment_dict, request_user_id

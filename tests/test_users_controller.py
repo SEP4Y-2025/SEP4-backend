@@ -19,24 +19,41 @@ def test_add_user_permission_success(client):
         "message": "User permission added successfully",
     }
 
-    payload = {"user_email": "email2@domain.com"}
+    token = "Bearer test_token"
 
     with patch("services.users_service.UsersService.add_permission", return_value=None):
-        response = client.put("/environments/env_1/assistants", json=payload)
-        assert response.status_code == 200
-        assert response.json() == mock_response
+        with patch(
+            "api.controllers.users_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.post(
+                f"/environments/env1/assistants?user_email=email2@domain.com",
+                headers={"Authorization": token},
+            )
+            assert response.status_code == 200
+            assert response.json() == mock_response
 
 
 def test_add_user_permission_missing_data(client):
-    payload = {"user_email": ""}
 
-    with patch("services.users_service.UsersService.add_permission") as mock_service:
-        mock_service.side_effect = ValueError(
-            "Invalid user permission data: 'user_email' is required"
+    mock_response = {"detail": "Invalid user data: 'user_email' is required"}
+
+    with patch(
+        "services.users_service.UsersService.add_permission"
+    ) as mock_add_permission:
+        mock_add_permission.side_effect = ValueError(
+            "Invalid user data: 'user_email' is required"
         )
-        response = client.put("/environments/env_1/assistants", json=payload)
+        with patch(
+            "api.controllers.users_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.post(
+                "/environments/env1/assistants?user_email=",
+                headers={"Authorization": "Bearer test_token"},
+            )
         assert response.status_code == 400
-        assert "Invalid user permission data" in response.json()["detail"]
+        assert response.json() == mock_response
 
 
 def test_get_user_success(client):

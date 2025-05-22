@@ -4,6 +4,7 @@ from main import app  # Adjust if your FastAPI app is in a different file
 
 client = TestClient(app)
 
+
 def test_add_get_delete_environment():
     # 1. Add environment
     payload = {"name": "Test Environment"}
@@ -35,10 +36,12 @@ def test_add_get_delete_environment():
     get_after_del = client.get(f"/environments/{env_id}")
     assert get_after_del.status_code == 404
 
+
 def test_get_environment_not_found():
     response = client.get("/environments/000000000000000000000000")
     assert response.status_code == 404
     assert response.json()["message"] == "Environment not found"
+
 
 def test_delete_environment_not_found():
     response = client.delete("/environments/000000000000000000000000")

@@ -47,6 +47,8 @@ def get_plant_pot(environment_id: str, pot_id: str, Authorization: str = Header(
         if not pot:
             raise HTTPException(status_code=404, detail="Plant pot not found")
         return {"pot": pot}
+    except HTTPException as e:
+        raise e
     except ValueError as e:
         if "not found" in str(e).lower():
             raise HTTPException(status_code=404, detail=str(e))
@@ -80,7 +82,6 @@ def get_pots_by_environment(environment_id: str, Authorization: str = Header(Non
 
 @router.delete("/environments/{env_id}/pots/{pot_id}")
 def delete_pot(env_id: str, pot_id: str, Authorization: str = Header(None)):
-    print("Received DELETE /pots/{pot_id} with id=", pot_id)
     try:
         request_user_id = decode_jwtheader(Authorization)
         if PlantPotsService().delete_plant_pot(pot_id, env_id, request_user_id):

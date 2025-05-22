@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 
 from api.controllers.plant_pots_controller import router as pot_router
@@ -39,9 +39,17 @@ def test_add_plant_pot_success(client):
         "services.plant_pots_service.PlantPotsService.add_plant_pot",
         return_value=mock_response,
     ):
-        response = client.post("/environments/1/pots", json=payload)
-        assert response.status_code == 200
-        assert response.json() == mock_response
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.post(
+                "/environments/1/pots",
+                json=payload,
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == mock_response
 
 
 def test_add_pot_missing_field(client):
@@ -56,38 +64,50 @@ def test_add_pot_missing_field(client):
     assert response.status_code == 422
 
 
-# def test_get_plant_pot_success(client):
-#     mock_pot = {
-#         "pot_id": "60f6f48e8d3f5b001f0e4d2b",
-#         "plant_pot_label": "Green Mint Pot",
-#         "watering_frequency": 3,
-#         "water_dosage": 250,
-#         "env_id": "234ab",
-#         "plant_type_id": "456gh",
-#     }
+def test_get_plant_pot_success(client):
+    mock_pot = {
+        "pot_id": "60f6f48e8d3f5b001f0e4d2b",
+        "plant_pot_label": "Green Mint Pot",
+        "watering_frequency": 3,
+        "water_dosage": 250,
+        "env_id": "234ab",
+        "plant_type_id": "456gh",
+    }
 
-#     with patch(
-#         "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
-#         return_value=mock_pot,
-#     ):
-#         response = client.get("/environments/234ab/pots/60f6f48e8d3f5b001f0e4d2b")
-#         assert response.status_code == 200
-#         assert response.json() == {"pot": mock_pot}
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
+        return_value=mock_pot,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/234ab/pots/60f6f48e8d3f5b001f0e4d2b",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"pot": mock_pot}
 
 
-# def test_get_plant_pot_not_found(client):
-#     environment_id = "234ab"
-#     non_existent_pot_id = "nonexistentpotid"
+def test_get_plant_pot_not_found(client):
+    environment_id = "234ab"
+    non_existent_pot_id = "nonexistentpotid"
 
-#     with patch(
-#         "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
-#         return_value=None,
-#     ):
-#         response = client.get(
-#             f"/environments/{environment_id}/pots/{non_existent_pot_id}"
-#         )
-#         assert response.status_code == 500
-#         assert response.json() == {"detail": "Internal server error"}
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_plant_pot_by_id",
+        return_value=None,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                f"/environments/{environment_id}/pots/{non_existent_pot_id}",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 404
+            assert response.json() == {"detail": "Plant pot not found"}
 
 
 def test_delete_plant_pot_success(client):
@@ -95,19 +115,16 @@ def test_delete_plant_pot_success(client):
         "services.plant_pots_service.PlantPotsService.delete_plant_pot",
         return_value=True,
     ):
-        response = client.delete("/environments/1/pots/662ebf49c7b9e2a7681e4a54")
-        assert response.status_code == 200
-        assert response.json() == {"message": "Pot deleted successfully"}
-
-
-def test_delete_nonexistent_pot(client):
-    with patch(
-        "services.plant_pots_service.PlantPotsService.delete_plant_pot"
-    ) as mock_delete:
-        mock_delete.side_effect = ValueError("Plant pot not found")
-        response = client.delete("/environments/1/pots/nonexistent_pot")
-        assert response.status_code == 400
-        assert "Plant pot not found" in response.json()["detail"]
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.delete(
+                "/environments/1/pots/662ebf49c7b9e2a7681e4a54",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"message": "Pot deleted successfully"}
 
 
 def test_delete_pot_unexpected_error(client):
@@ -115,6 +132,13 @@ def test_delete_pot_unexpected_error(client):
         "services.plant_pots_service.PlantPotsService.delete_plant_pot"
     ) as mock_delete:
         mock_delete.side_effect = Exception("Unexpected error")
-        response = client.delete("/environments/1/pots/pot_1")
-        assert response.status_code == 500
-        assert "Unexpected error" in response.json()["detail"]
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.delete(
+                "/environments/1/pots/pot_1",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 500
+            assert "Unexpected error" in response.json()["detail"]

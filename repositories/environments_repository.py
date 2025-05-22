@@ -112,7 +112,7 @@ class EnvironmentsRepository:
     def delete_environment(self, environment_id: str):
         result = self.collection.delete_one({"_id": ObjectId(environment_id)})
         return result.deleted_count > 0
-    
+
     def environment_name_exists(self, user_id: str, name: str) -> bool:
         try:
             count = self.collection.count_documents(

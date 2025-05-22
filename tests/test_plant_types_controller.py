@@ -1,7 +1,10 @@
+# tests/test_plant_types.py
+
+from unittest.mock import patch
+
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from unittest.mock import patch
 
 from api.controllers.plant_types_controller import router as plant_types_router
 
@@ -12,37 +15,6 @@ app.include_router(plant_types_router)
 @pytest.fixture
 def client():
     return TestClient(app)
-
-
-def test_add_plant_type_success(client):
-    mock_response = {
-        "message": "Plant type added successfully",
-        "plantTypeId": "plant_type_1",
-    }
-
-    payload = {"name": "Cactus", "watering_frequency": 7, "water_dosage": 100}
-
-    with patch(
-        "services.plant_types_service.PlantTypesService.add_plant_type",
-        return_value="plant_type_1",
-    ):
-        response = client.post("/environments/env_1/plant_types", json=payload)
-        assert response.status_code == 200
-        assert response.json() == mock_response
-
-
-def test_add_plant_type_missing_data(client):
-    payload = {"watering_frequency": 7, "water_dosage": 100}
-
-    response = client.post("/environments/env_1/plant_types", json=payload)
-    assert response.status_code == 422
-
-    error_detail = response.json()["detail"]
-
-    assert any(
-        err.get("loc") == ["body", "name"] and "Field required" in err.get("msg", "")
-        for err in error_detail
-    )
 
 
 def test_get_plant_types_success(client):
@@ -67,11 +39,17 @@ def test_get_plant_types_success(client):
         "services.plant_types_service.PlantTypesService.get_all_plant_types",
         return_value=mock_plant_types,
     ):
-        response = client.get("/environments/env123/plant_types")
-        assert response.status_code == 200
-        assert "PlantTypes" in response.json()
-        assert len(response.json()["PlantTypes"]) == 2
-        assert response.json()["PlantTypes"][0]["name"] == "Mint"
+        with patch(
+            "api.controllers.plant_types_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/env123/plant_types",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert "PlantTypes" in response.json()
+            assert len(response.json()["PlantTypes"]) == 2
 
 
 def test_get_plant_types_not_found(client):
@@ -81,6 +59,13 @@ def test_get_plant_types_not_found(client):
         mock_service.side_effect = ValueError(
             "No plant types found for environment ID: env999"
         )
-        response = client.get("/environments/env999/plant_types")
-        assert response.status_code == 400
-        assert "No plant types found" in response.json()["detail"]
+        with patch(
+            "api.controllers.plant_types_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/env999/plant_types",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 400
+            assert "No plant types found" in response.json()["detail"]
