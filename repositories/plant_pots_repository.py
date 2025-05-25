@@ -20,14 +20,13 @@ class PlantPotsRepository:
 
             self.env_collection.update_one(
                 {"_id": ObjectId(environment_id)},
-                {"$addToSet": {"plant_pots": pot_data}}
+                {"$addToSet": {"plant_pots": pot_data}},
             )
             return pot_id
         except Exception as e:
             print(f"Error inserting pot: {e}")
             return None
 
-        
     def get_pots_by_environment(self, environment_id: str):
         try:
             env_obj_id = ObjectId(environment_id)
@@ -43,7 +42,6 @@ class PlantPotsRepository:
 
     def delete_pot(self, pot_id: str):
         result = self.env_collection.update_one(
-            {"plant_pots.pot_id": pot_id},
-            {"$pull": {"plant_pots": {"pot_id": pot_id}}}
+            {"plant_pots.pot_id": pot_id}, {"$pull": {"plant_pots": {"pot_id": pot_id}}}
         )
         return result.modified_count > 0

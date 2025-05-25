@@ -68,7 +68,6 @@ def add_environment(request: AddEnvironmentRequest, Authorization: str = Header(
     try:
         request_user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        print(request_user_id)
         response = service.add_environment(request, request_user_id)
         return response
     except ValueError as e:

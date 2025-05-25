@@ -24,7 +24,6 @@ def add_plant_pot(
 
 @router.get("/logs")
 def get_logs():
-    print("Received GET /logs.")
     try:
         logs = [
             "10.34 - plant watered",

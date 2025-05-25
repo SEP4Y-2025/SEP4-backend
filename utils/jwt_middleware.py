@@ -52,7 +52,6 @@ def decode_jwtheader(Authorization: str = Header(None)):
             options={"verify_signature": False},
         )
         user_id = payload.get("id")
-        print("Decoded user_id:", user_id)
         return user_id
     except PyJWTError:
         return None

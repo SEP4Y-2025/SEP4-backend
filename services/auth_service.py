@@ -79,17 +79,14 @@ class AuthService:
             return user_id
         except Exception as e:
 
-            print(f"Error creating user: {str(e)}")
             print(traceback.format_exc())
             return None
 
     def change_password(self, user_id: str, old_password: str, new_password: str):
         user = self.auth_repository.find_user_by_id(user_id)
         if not user:
-            print(f"User with ID {user_id} not found")
             return False
         if not self.verify_password(old_password, user["password"]):
-            print("Old password is incorrect")
             return False
         new_hashed = self.get_password_hash(new_password)
         return self.auth_repository.update_user_password(user_id, new_hashed)
