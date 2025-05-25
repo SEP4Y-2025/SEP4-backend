@@ -133,3 +133,27 @@ def test_get_environment_permissions_not_found(client):
         response = client.get("/environments/env_1/assistants")
         assert response.status_code == 404
         assert response.json() == {"detail": "Environment not found"}
+
+def test_get_user_environments(client):
+    mock_response = {
+        "environments": [
+            {"environment_id": "env_1", "role": "Plant Assistant"},
+            {"environment_id": "env_2", "role": "Plant Assistant"},
+        ]
+    }
+
+    with patch(
+        "services.users_service.UsersService.get_user_environments",
+        return_value=mock_response["environments"],
+    ):
+        response = client.get("/users/user_1/environments")
+        assert response.status_code == 200
+        assert response.json() == mock_response
+def test_get_user_environments_not_found(client):
+    with patch(
+        "services.users_service.UsersService.get_user_environments"
+    ) as mock_service:
+        mock_service.side_effect = ValueError("User not found")
+        response = client.get("/users/user_1/environments")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "User not found"}

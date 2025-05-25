@@ -120,3 +120,45 @@ def test_delete_user_permission(users_repo):
     assert len(updated_user["environments"]) == 0
     assert users_repo.env_collection.find_one({"_id": ObjectId("680f8359688cb5341f9f9c19")}) is not None
     assert users_repo.env_collection.find_one({"_id": ObjectId("680f8359688cb5341f9f9c19")})["access_control"] == []
+
+def test_get_user_permissions(users_repo):
+    env_id = ObjectId("680f8359688cb5341f9f9c19")
+    user_id = ObjectId("680f8359688cb5341f9f9c18")
+
+    user_doc = {
+        "_id": user_id,
+        "email": "email1@domain.com",
+        "password": "password1",
+        "name": "User1",
+        "environments": [
+            {
+                "environment_id": env_id,
+                "role": "Plant Assistant"
+            }
+        ]
+    }
+    users_repo.user_collection.insert_one(user_doc)
+    users_repo.env_collection.insert_one({
+        "_id": env_id,
+        "name": "Test Environment",
+        "owner_id": ObjectId(),
+        "window_state": "closed",
+        "access_control": [
+            {
+                "user_id": user_id,
+                "role": "Plant Assistant"
+            }
+        ],
+        "plant_pots": []
+    })
+
+    user_permissions = users_repo.get_user_permissions(str(env_id))
+    assert user_permissions is not None
+    assert len(user_permissions) == 1
+    assert user_permissions[0]["user_id"] == str(user_id)
+    assert user_permissions[0]["role"] == "Plant Assistant"
+
+def test_get_user_permissions_not_found(users_repo):
+    env_id = ObjectId("680f8359688cb5341f9f9c19")
+    with pytest.raises(ValueError, match="Environment not found"):
+        users_repo.get_user_permissions(str(env_id))

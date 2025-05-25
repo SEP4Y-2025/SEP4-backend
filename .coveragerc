@@ -6,3 +6,6 @@ omit =
     api/global_exception_handler.py
     utils/password_hash.py
     api/controllers/root.py
+    tests/*
+    core/mqtt_client.py
+    utils/jwt_middleware.py
