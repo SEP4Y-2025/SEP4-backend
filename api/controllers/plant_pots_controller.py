@@ -5,6 +5,7 @@ from services.plant_pots_service import PlantPotsService
 from models.plant_pot import AddPlantPotRequest, AddPlantPotResponse
 from bson import ObjectId
 from utils.jwt_middleware import decode_jwtheader
+from utils.helper import convert_object_ids
 
 router = APIRouter()
 
@@ -100,7 +101,8 @@ def delete_pot(env_id: str, pot_id: str, Authorization: str = Header(None)):
 def get_historical_data(env_id: str, pot_id: str, Authorization: str = Header(None)):
     try:
         request_user_id = decode_jwtheader(Authorization)
-        data = PlantPotsService().get_historical_data(env_id, pot_id, request_user_id)
+        data = PlantPotsService().get_historical_data(pot_id, env_id, request_user_id)
+        data = convert_object_ids(data)
         return JSONResponse(content={"historicalData": data}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

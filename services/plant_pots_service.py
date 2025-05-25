@@ -163,11 +163,9 @@ class PlantPotsService:
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 
-        # Get the pot from DB first to gather full info (before deletion)
         pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError("Plant pot not found")
 
-        # Get historical data
         historical_data = self.sensor_readings_repo.get_historical_data(pot_id)
         return historical_data
