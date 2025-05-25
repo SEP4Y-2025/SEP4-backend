@@ -31,7 +31,6 @@ class PlantDataRepository:
         try:
             data = list(self.collection.find())
             if not data:
-                print("No plant data found in database")
                 return []
 
             for item in data:

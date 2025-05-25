@@ -66,7 +66,6 @@ class MQTTClient:
         print(f"Pots: {self.environments_repo.find_pot_by_id(pot_id)}")
 
         if result == False:
-            # print(f"Pot ID {pot_id} not updated")
             raise ValueError(f"Pot ID {pot_id} not found")
 
     def on_message(self, client, userdata, msg):

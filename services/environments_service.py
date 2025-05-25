@@ -14,9 +14,6 @@ class EnvironmentsService:
 
     def get_environments(self):
         result = self.environments_repository.get_environments()
-        print(
-            f"Environments service returned {len(result) if result else 0} environments"
-        )
         return result
 
     def get_environment_by_id(self, environment_id: str, user_id: str):

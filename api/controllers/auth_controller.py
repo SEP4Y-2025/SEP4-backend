@@ -43,7 +43,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     except Exception as e:
         import traceback
 
-        print(f"Login error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 

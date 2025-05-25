@@ -22,7 +22,7 @@ def run_seed_data():
         {"_id": "pot_3", "active": False},
         {"_id": "pot_4", "active": False},
         {"_id": "pot_5", "active": False},
-        {"_id": "pot_6", "active": False}
+        {"_id": "pot_6", "active": False},
     ]
 
     # Initial environment data
@@ -209,11 +209,10 @@ def run_seed_data():
     collectionEnv.delete_many({})
     collectionUsers.delete_many({})
 
-
     collection.insert_many(initial_arduinos)
     collectionPlantTypes.insert_many(plant_types)
     collectionEnv.insert_many(initial_envs)
     collectionUsers.insert_many(users)
 
-run_seed_data()
 
+run_seed_data()

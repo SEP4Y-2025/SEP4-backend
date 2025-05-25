@@ -143,6 +143,7 @@ def test_delete_pot_unexpected_error(client):
             assert response.status_code == 500
             assert "Unexpected error" in response.json()["detail"]
 
+
 def get_pots_by_environment_success(client):
     mock_pots = [
         {"pot_id": "pot_1", "plant_pot_label": "Pot 1"},
@@ -163,6 +164,8 @@ def get_pots_by_environment_success(client):
             )
             assert response.status_code == 200
             assert response.json() == {"pots": mock_pots}
+
+
 def test_get_pots_by_environment_not_found(client):
     with patch(
         "services.plant_pots_service.PlantPotsService.get_pots_by_environment",
@@ -178,6 +181,7 @@ def test_get_pots_by_environment_not_found(client):
             )
             assert response.status_code == 400
             assert response.json() == {"detail": "Invalid environment ID"}
+
 
 def test_get_history_success(client):
     mock_history = [
@@ -199,6 +203,7 @@ def test_get_history_success(client):
             )
             assert response.status_code == 200
             assert response.json() == {"historicalData": mock_history}
+
 
 def test_get_history_not_found(client):
     with patch(

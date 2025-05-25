@@ -44,8 +44,6 @@ class PlantPotsService:
             "water_dosage": plant_type["water_dosage"],
         }
 
-        print("Sending command to MQTT broker:", payload)
-
         # result = mqtt_client.send(f"/{pot.pot_id}/activate", payload)
 
         # if result.get("error"):
@@ -86,14 +84,13 @@ class PlantPotsService:
             plant_type_name=plant_type["name"],
             watering_frequency=plant_type["watering_frequency"],
             water_dosage=plant_type["water_dosage"],
-            environment_id=environment_id
+            environment_id=environment_id,
         )
 
     def get_plant_pot_by_id(
         self, env_id: str, pot_id: str, user_id: str
     ) -> GetPlantPotResponse:
         if self.auth_service.check_user_permissions(user_id, env_id):
-            print("yay")
             pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
@@ -152,7 +149,6 @@ class PlantPotsService:
 
         # Delete sensor readings related to this pot from the sensor_readings collection
         deleted_count = self.sensor_readings_repo.delete_by_pot(pot_id)
-        print(f"Deleted {deleted_count} sensor readings associated with pot {pot_id}")
 
         # Delete from DB
         self.environments_repo.delete_pot(pot_id)
@@ -167,11 +163,9 @@ class PlantPotsService:
         if not self.arduinos_repo.is_registered(pot_id):
             raise ValueError("Unknown or unregistered Arduino")
 
-        # Get the pot from DB first to gather full info (before deletion)
         pot = self.environments_repo.find_pot_by_id(pot_id)
         if not pot:
             raise ValueError("Plant pot not found")
 
-        # Get historical data
         historical_data = self.sensor_readings_repo.get_historical_data(pot_id)
         return historical_data
