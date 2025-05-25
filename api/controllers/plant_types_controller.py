@@ -18,6 +18,8 @@ def get_plant_types_by_environment(
         service = PlantTypesService()
         plantTypes = service.get_all_plant_types(environment_id, user_id)
         return {"PlantTypes": plantTypes}
+    except HTTPException as e:
+        raise e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:

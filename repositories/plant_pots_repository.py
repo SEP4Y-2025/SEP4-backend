@@ -13,38 +13,21 @@ class PlantPotsRepository:
     def insert_pot(self, pot_data: dict):
         try:
             environment_id = pot_data.get("environment_id")
-            pot_id = pot_data.get("pot_id")  # Must be a string
+            pot_id = pot_data.get("pot_id")
 
             if not pot_id or not environment_id:
-                raise ValueError("Pot data must include '_id' and 'environment_id'")
+                raise ValueError("Pot data must include 'pot_id' and 'environment_id'")
 
-            pot_data["_id"] = ObjectId(pot_id)
-
-            # Insert into plant_pots collection
-            self.plant_pots_collection.insert_one(pot_data)
-
-            # Update environment to include this pot ID
             self.env_collection.update_one(
-                {"_id": ObjectId(environment_id)}, {"$addToSet": {"plantPots": pot_id}}
+                {"_id": ObjectId(environment_id)},
+                {"$addToSet": {"plant_pots": pot_data}}
             )
             return pot_id
         except Exception as e:
             print(f"Error inserting pot: {e}")
             return None
 
-    def get_pot(self, pot_id: str):
-        return self.plant_pots_collection.find_one({"_id": pot_id})
-
-    def update_pot(self, pot_id: str, update_data: dict):
-        return self.plant_pots_collection.update_one(
-            {"_id": pot_id}, {"$set": update_data}
-        )
-
-    def find_pot_by_id(self, pot_id: str):
-        pot = self.plant_pots_collection.find_one({"_id": pot_id})
-        return pot if pot else None
-        # return convert_object_ids(pot) if pot else None
-
+        
     def get_pots_by_environment(self, environment_id: str):
         try:
             env_obj_id = ObjectId(environment_id)
@@ -59,13 +42,8 @@ class PlantPotsRepository:
             return []
 
     def delete_pot(self, pot_id: str):
-        # Remove from environments
-        self.env_collection.update_many(
-            {"plantPots": pot_id}, {"$pull": {"plantPots": pot_id}}
+        result = self.env_collection.update_one(
+            {"plant_pots.pot_id": pot_id},
+            {"$pull": {"plant_pots": {"pot_id": pot_id}}}
         )
-
-        # Delete from plant_pots
-        result = self.plant_pots_collection.delete_one({"_id": pot_id})
-        if result.deleted_count == 0:
-            raise ValueError(f"No plant pot found with ID {pot_id}")
-        return True
+        return result.modified_count > 0
