@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+import traceback
 from typing import Optional
 import jwt
 from passlib.context import CryptContext
@@ -9,7 +10,7 @@ from repositories.users_repository import UsersRepository
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-SECRET_KEY = "secret-key"  # Replace with your actual secret key | haha, nice
+SECRET_KEY = "secret-key"  # Replace with your actual secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -77,7 +78,6 @@ class AuthService:
             print(f"User created with ID: {user_id}")
             return user_id
         except Exception as e:
-            import traceback
 
             print(f"Error creating user: {str(e)}")
             print(traceback.format_exc())

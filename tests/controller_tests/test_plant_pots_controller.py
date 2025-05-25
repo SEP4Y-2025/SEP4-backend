@@ -142,3 +142,76 @@ def test_delete_pot_unexpected_error(client):
             )
             assert response.status_code == 500
             assert "Unexpected error" in response.json()["detail"]
+
+def get_pots_by_environment_success(client):
+    mock_pots = [
+        {"pot_id": "pot_1", "plant_pot_label": "Pot 1"},
+        {"pot_id": "pot_2", "plant_pot_label": "Pot 2"},
+    ]
+
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_pots_by_environment",
+        return_value=mock_pots,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/1/pots",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"pots": mock_pots}
+def test_get_pots_by_environment_not_found(client):
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_pots_by_environment",
+        return_value=None,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/1/pots",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 400
+            assert response.json() == {"detail": "Invalid environment ID"}
+
+def test_get_history_success(client):
+    mock_history = [
+        {"pot_id": "pot_1", "timestamp": "2023-01-01T00:00:00", "temperature": 25.5},
+        {"pot_id": "pot_1", "timestamp": "2023-01-02T00:00:00", "temperature": 26.0},
+    ]
+
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_historical_data",
+        return_value=mock_history,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/1/pots/pot_1/historicalData",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"historicalData": mock_history}
+
+def test_get_history_not_found(client):
+    with patch(
+        "services.plant_pots_service.PlantPotsService.get_historical_data",
+        return_value=None,
+    ):
+        with patch(
+            "api.controllers.plant_pots_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/1/pots/pot_1/historicalData",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"historicalData": None}

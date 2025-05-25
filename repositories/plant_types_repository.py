@@ -18,7 +18,6 @@ class PlantTypesRepository:
         try:
             env_obj_id = ObjectId(environment_id)  # Convert to ObjectId
             environment = self.env_collection.find_one({"_id": env_obj_id})
-            print(f"Environment found: {environment}")
             return environment
         except Exception as e:
             print(f"Error fetching environment by ID: {e}")

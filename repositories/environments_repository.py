@@ -32,7 +32,6 @@ class EnvironmentsRepository:
 
     def insert_pot(self, environment_id: str, pot_data: dict):
         try:
-            # First, try to update the existing pot if it exists
             result = self.collection.update_one(
                 {
                     "_id": ObjectId(environment_id),
@@ -41,7 +40,6 @@ class EnvironmentsRepository:
                 {"$set": {"plant_pots.$": pot_data}},
             )
 
-            # If no pot was updated, insert the new one
             if result.matched_count == 0:
                 result = self.collection.update_one(
                     {"_id": ObjectId(environment_id)},

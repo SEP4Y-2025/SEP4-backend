@@ -1,3 +1,4 @@
+from bson import ObjectId
 from models.plant_pot import (
     AddPlantPotRequest,
     AddPlantPotResponse,
@@ -61,8 +62,7 @@ class PlantPotsService:
         pot_doc = {
             "pot_id": pot.pot_id,
             "label": pot.plant_pot_label,
-            "plant_type_id": pot.plant_type_id,
-            "environment_id": environment_id,
+            "plant_type_id": ObjectId(pot.plant_type_id),
             "state": {
                 "soil_humidity": 0,
                 "air_humidity": 0,
@@ -86,7 +86,7 @@ class PlantPotsService:
             plant_type_name=plant_type["name"],
             watering_frequency=plant_type["watering_frequency"],
             water_dosage=plant_type["water_dosage"],
-            environment_id=pot_doc["environment_id"],
+            environment_id=environment_id
         )
 
     def get_plant_pot_by_id(
@@ -159,3 +159,19 @@ class PlantPotsService:
         self.arduinos_repo.mark_inactive(pot_id)
 
         return True
+
+    def get_historical_data(self, pot_id: str, env_id: str, user_id: str):
+        if not self.auth_service.check_user_permissions(user_id, env_id):
+            raise ValueError("User does not have permission to view this environment")
+
+        if not self.arduinos_repo.is_registered(pot_id):
+            raise ValueError("Unknown or unregistered Arduino")
+
+        # Get the pot from DB first to gather full info (before deletion)
+        pot = self.environments_repo.find_pot_by_id(pot_id)
+        if not pot:
+            raise ValueError("Plant pot not found")
+
+        # Get historical data
+        historical_data = self.sensor_readings_repo.get_historical_data(pot_id)
+        return historical_data

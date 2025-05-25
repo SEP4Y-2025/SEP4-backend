@@ -95,3 +95,16 @@ def delete_pot(env_id: str, pot_id: str, Authorization: str = Header(None)):
     except Exception as e:
         # Handle unexpected errors
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/environments/{env_id}/pots/{pot_id}/historicalData")
+def get_historical_data(env_id: str, pot_id: str, Authorization: str = Header(None)):
+    try:
+        request_user_id = decode_jwtheader(Authorization)
+        data = PlantPotsService().get_historical_data(env_id, pot_id, request_user_id)
+        return JSONResponse(content={"historicalData": data}, status_code=200)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        # Handle unexpected errors
+        raise HTTPException(status_code=500, detail=str(e))
