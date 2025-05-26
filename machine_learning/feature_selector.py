@@ -36,11 +36,14 @@ class NeuralFeatureSelector:
             y_train_np = y_train.to_numpy().astype(np.float32)
             X_val_np = X_val.to_numpy().astype(np.float32)
             y_val_np = y_val.to_numpy().astype(np.float32)
-            
-            early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
-            
+
+            early_stopping = EarlyStopping(
+                monitor="val_loss", patience=5, restore_best_weights=True
+            )
+
             history = self.model.fit(
-                X_train_np, y_train_np,
+                X_train_np,
+                y_train_np,
                 validation_data=(X_val_np, y_val_np),
                 epochs=epochs,
                 batch_size=batch_size,
@@ -57,7 +60,7 @@ class NeuralFeatureSelector:
     def get_feature_importance(self, X, feature_names):
         try:
             X_np = X.to_numpy().astype(np.float32)
-            
+
             baseline_prediction = self.model.predict(X_np, verbose=0)
             baseline_mse = np.mean((baseline_prediction - baseline_prediction) ** 2)
 
@@ -74,12 +77,16 @@ class NeuralFeatureSelector:
                 importance_scores.append(importance)
 
             feature_importance = dict(zip(feature_names, importance_scores))
-            
+
             feature_importance = {k: float(v) for k, v in feature_importance.items()}
-            
-            sorted_importance = {k: v for k, v in sorted(
-                feature_importance.items(), key=lambda item: item[1], reverse=True)}
-            
+
+            sorted_importance = {
+                k: v
+                for k, v in sorted(
+                    feature_importance.items(), key=lambda item: item[1], reverse=True
+                )
+            }
+
             return sorted_importance
         except Exception as e:
             traceback.print_exc()

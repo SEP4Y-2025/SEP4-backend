@@ -15,21 +15,23 @@ logger = logging.getLogger(__name__)
 
 try:
     from machine_learning.model_service import SoilHumidityService
+
     logger.info("Successfully imported SoilHumidityService")
 except ImportError:
     logger.warning("Could not import SoilHumidityService, using fallback")
+
     class SoilHumidityService:
         def predict_future_humidity(self, plant_pot_id=None, minutes_ahead=5):
             return {
                 "plant_pot_id": plant_pot_id or "unknown",
                 "current_timestamp": "2025-05-15T12:00:00",
-                "prediction_timestamp": "2025-05-15T12:05:00", 
+                "prediction_timestamp": "2025-05-15T12:05:00",
                 "current_soil_humidity": 60.0,
                 "predicted_soil_humidity": 58.5,
                 "features_used": ["temperature", "air_humidity"],
                 "prediction_method": "fallback",
             }
-            
+
         def get_model_metrics(self):
             return {
                 "message": "Using simplified prediction model",
@@ -38,6 +40,7 @@ except ImportError:
                 "test": {"mse": 23.4, "rmse": 4.8, "mae": 4.1, "r2": 0.60},
                 "model_type": "fallback",
             }
+
 
 class NumpyJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -48,10 +51,11 @@ class NumpyJSONEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         elif isinstance(obj, np.bool_):
-            return bool(obj)  
-        elif hasattr(obj, 'tolist'):
+            return bool(obj)
+        elif hasattr(obj, "tolist"):
             return obj.tolist()
         return super().default(obj)
+
 
 def convert_numpy_types(obj):
     """Recursively convert NumPy types in dictionaries and lists to Python native types"""
@@ -67,7 +71,7 @@ def convert_numpy_types(obj):
         return obj.tolist()
     elif isinstance(obj, np.bool_):
         return bool(obj)
-    elif hasattr(obj, 'tolist'):
+    elif hasattr(obj, "tolist"):
         return obj.tolist()
     return obj
 
@@ -79,29 +83,27 @@ async def test_endpoint():
 
 
 @router.get("/api/prediction/future-humidity")
-async def predict_future_humidity(plant_pot_id: Optional[str] = Query(None), minutes_ahead: int = 5):
+async def predict_future_humidity(
+    plant_pot_id: Optional[str] = Query(None), minutes_ahead: int = 5
+):
     try:
 
         service = SoilHumidityService()
-        
+
         prediction_result = await asyncio.to_thread(
-            service.predict_future_humidity, 
-            plant_pot_id=plant_pot_id, 
-            minutes_ahead=minutes_ahead
+            service.predict_future_humidity,
+            plant_pot_id=plant_pot_id,
+            minutes_ahead=minutes_ahead,
         )
-        
+
         if "error" in prediction_result:
             return JSONResponse(
-                status_code=404,
-                content={"detail": prediction_result["error"]}
+                status_code=404, content={"detail": prediction_result["error"]}
             )
-        
+
         converted_result = convert_numpy_types(prediction_result)
-            
-        return JSONResponse(
-            status_code=200,
-            content=converted_result
-        )
+
+        return JSONResponse(status_code=200, content=converted_result)
     except Exception as e:
         traceback.print_exc()
         logger.error(f"Future prediction error: {str(e)}")
@@ -113,60 +115,56 @@ async def predict_future_humidity(plant_pot_id: Optional[str] = Query(None), min
 @router.get("/api/prediction/model-metrics")
 async def get_model_metrics():
     try:
-        metrics_file = os.path.join("machine_learning/models/saved", "training_metrics.json")
-        
+        metrics_file = os.path.join(
+            "machine_learning/models/saved", "training_metrics.json"
+        )
+
         if os.path.exists(metrics_file):
             try:
-                with open(metrics_file, 'r') as f:
+                with open(metrics_file, "r") as f:
                     metrics_from_file = json.load(f)
                 logger.info(f"Loaded metrics directly from file: {metrics_file}")
-            
+
                 model_path = "machine_learning/models/saved/latest.pkl"
                 feature_data = {}
-                
+
                 if os.path.exists(model_path):
                     service = SoilHumidityService()
-                    
 
-                    if hasattr(service.model, 'top_features'):
-                        feature_data["model_features"] = convert_numpy_types(service.model.top_features)
-                        
-                    if hasattr(service.model, 'feature_importance'):
-                        feature_data["feature_importance"] = convert_numpy_types(service.model.feature_importance)
-                
+                    if hasattr(service.model, "top_features"):
+                        feature_data["model_features"] = convert_numpy_types(
+                            service.model.top_features
+                        )
+
+                    if hasattr(service.model, "feature_importance"):
+                        feature_data["feature_importance"] = convert_numpy_types(
+                            service.model.feature_importance
+                        )
+
                 result = {
                     "training_metrics": metrics_from_file.get("train", {}),
                     "validation_metrics": metrics_from_file.get("validation", {}),
                     "test_metrics": metrics_from_file.get("test", {}),
-                    **feature_data
+                    **feature_data,
                 }
-                
+
                 return JSONResponse(
-                    status_code=200,
-                    content=convert_numpy_types(result)
+                    status_code=200, content=convert_numpy_types(result)
                 )
             except Exception as e:
                 logger.warning(f"Error reading metrics file: {str(e)}")
 
-        
-
         service = SoilHumidityService()
-        
+
         metrics = await asyncio.to_thread(service.get_model_metrics)
-        
+
         if "error" in metrics:
-            return JSONResponse(
-                status_code=500,
-                content={"detail": metrics["error"]}
-            )
-        
+            return JSONResponse(status_code=500, content={"detail": metrics["error"]})
+
         converted_metrics = convert_numpy_types(metrics)
-            
-        return JSONResponse(
-            status_code=200,
-            content=converted_metrics
-        )
-        
+
+        return JSONResponse(status_code=200, content=converted_metrics)
+
     except Exception as e:
         traceback.print_exc()
         logger.error(f"Error retrieving metrics: {str(e)}")
