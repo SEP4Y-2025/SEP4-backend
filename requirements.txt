@@ -7,3 +7,12 @@ pyjwt
 passlib[bcrypt]
 bcrypt
 python-dotenv
+tensorflow>=2.4.0
+scikit-learn>=0.24.0
+pandas>=1.2.0
+numpy>=1.19.0
+schedule>=1.0.0
+python-dotenv==1.0.0
+pydantic==2.3.0
+keras==2.15.0
+xgboost>=1.7.3
