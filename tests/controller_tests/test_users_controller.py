@@ -27,7 +27,7 @@ def test_add_user_permission_success(client):
             return_value="mock_user_id",
         ):
             response = client.post(
-                f"/environments/env1/assistants?user_email=email2@domain.com",
+                "/environments/env1/assistants?user_email=email2@domain.com",
                 headers={"Authorization": token},
             )
             assert response.status_code == 200
