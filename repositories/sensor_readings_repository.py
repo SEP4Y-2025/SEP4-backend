@@ -6,7 +6,7 @@ class SensorReadingsRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
-        self.collection = self.db["sensor_readings"]
+        self.collection = self.db["plant_data"]
 
     def create(self, data: dict):
         result = self.collection.insert_one(data)
