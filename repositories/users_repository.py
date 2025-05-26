@@ -58,11 +58,22 @@ class UsersRepository:
                 raise ValueError("User not found")
 
             environments = user.get("environments", [])
-            environment_data = [
-                {"environment_id": str(env["environment_id"]), "role": env["role"]}
-                for env in environments
-                if "environment_id" in env and "role" in env
-            ]
+            environment_data = []
+            for env in environments:
+                if "environment_id" in env and "role" in env:
+                    env_doc = self.env_collection.find_one(
+                        {"_id": ObjectId(env["environment_id"])}, {"name": 1}
+                    )
+                    env_name = (
+                        env_doc["name"] if env_doc and "name" in env_doc else None
+                    )
+                    environment_data.append(
+                        {
+                            "environment_id": str(env["environment_id"]),
+                            "environment_name": env_name,
+                            "role": env["role"],
+                        }
+                    )
 
             return environment_data
         except Exception as e:
@@ -143,4 +154,57 @@ class UsersRepository:
             return user_permissions
         except Exception as e:
             print(f"Error fetching user permissions: {e}")
+            raise
+
+    def get_user_role(self, user_id: str, environment_id: str):
+        try:
+            user = self.user_collection.find_one(
+                {"_id": ObjectId(user_id)},
+                {"environments.environment_id": 1, "environments.role": 1},
+            )
+            if not user:
+                raise ValueError("User not found")
+
+            environments = user.get("environments", [])
+            print(f"Environments: {environments}")
+            for env in environments:
+                if str(env["environment_id"]) == environment_id:
+                    return env["role"]
+
+            raise ValueError("User does not have access to this environment")
+        except Exception as e:
+            print(f"Error in get_user_role: {e}")
+            raise
+
+    def add_environment_to_user(self, user_id: str, environment: dict):
+        try:
+            self.user_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {
+                    "$addToSet": {
+                        "environments": {
+                            "environment_id": ObjectId(environment["environment_id"]),
+                            "role": environment["role"],
+                        }
+                    }
+                },
+            )
+        except Exception as e:
+            print(f"Error in add_environment_to_user: {e}")
+            raise
+
+    def remove_environment_from_user(self, user_id: str, environment_id: str):
+        try:
+            self.user_collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {
+                    "$pull": {
+                        "environments": {
+                            "environment_id": ObjectId(environment_id),
+                        }
+                    }
+                },
+            )
+        except Exception as e:
+            print(f"Error in remove_environment_from_user: {e}")
             raise

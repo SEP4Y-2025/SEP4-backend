@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from models.auth import TokenResponse, RegisterRequest, ChangePasswordRequest
+from models.auth import TokenResponse, RegisterRequest, PasswordUpdateRequest
 from services.auth_service import AuthService
 from datetime import timedelta
+from utils.jwt_middleware import decode_jwtheader
+
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
@@ -41,12 +43,11 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     except Exception as e:
         import traceback
 
-        print(f"Login error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.post("/auth/register")
+@router.post("/auth/registration")
 async def register(user_data: RegisterRequest):
     try:
         auth_service = AuthService()
@@ -66,12 +67,17 @@ async def register(user_data: RegisterRequest):
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
-@router.post("/auth/change-password")
-async def change_password(data: ChangePasswordRequest):
+@router.put("/auth/password")
+async def update_password(
+    data: PasswordUpdateRequest, Authorization: str = Header(None)
+):
     try:
+        user_id = decode_jwtheader(Authorization)
+        if not data.new_password or not data.old_password.strip():
+            raise HTTPException(status_code=400, detail="New password cannot be empty")
         auth_service = AuthService()
         success = auth_service.change_password(
-            data.email, data.old_password, data.new_password
+            user_id, data.old_password, data.new_password
         )
         if not success:
             raise HTTPException(status_code=400, detail="Failed to change password")

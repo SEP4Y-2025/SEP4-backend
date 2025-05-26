@@ -6,7 +6,7 @@ class SensorReadingsRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
-        self.collection = self.db["sensor_readings"]
+        self.collection = self.db["plant_data"]
 
     def create(self, data: dict):
         result = self.collection.insert_one(data)
@@ -24,3 +24,11 @@ class SensorReadingsRepository:
         # Delete all sensor readings associated with the given pot_id
         result = self.collection.delete_many({"plant_pot_id": pot_id})
         return result.deleted_count  # Return the number of documents deleted
+
+    def get_historical_data(self, pot_id: str):
+        readings = list(
+            self.collection.find({"plant_pot_id": pot_id})
+            .sort("timestamp", -1)
+            .limit(10)
+        )
+        return readings

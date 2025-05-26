@@ -1,7 +1,7 @@
 # This was my refference:
 # https://blog.marzeta.pl/python-and-jwt-a-comprehensive-guide-to-secure-sessions/#:~:text=Implementing%20JWTs%20with%20Python&text=In%20this%20code%2C%20we%20first,and%20the%20decoded%20JWT%20payload.
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import PyJWTError
@@ -35,3 +35,23 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
 
     return user
+
+
+def decode_jwtheader(Authorization: str = Header(None)):
+    try:
+        if not Authorization or not Authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid authentication credentials",
+            )
+        token = Authorization.split("Bearer ")[1]
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            options={"verify_signature": False},
+        )
+        user_id = payload.get("id")
+        return user_id
+    except PyJWTError:
+        return None

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
 from fastapi.responses import JSONResponse
 from services.environments_service import EnvironmentsService
 from models.environment import AddEnvironmentRequest, AddEnvironmentResponse
@@ -9,6 +9,7 @@ from models.environment import (
     AddEnvironmentRequest,
     AddEnvironmentResponse,
 )
+from utils.jwt_middleware import decode_jwtheader
 
 router = APIRouter()
 
@@ -38,10 +39,11 @@ def get_environments():
 
 
 @router.get("/environments/{environment_id}", response_class=JSONResponse)
-def get_environment_by_id(environment_id: str):
+def get_environment_by_id(environment_id: str, Authorization: str = Header(None)):
     try:
+        user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        environment = service.get_environment_by_id(environment_id)
+        environment = service.get_environment_by_id(environment_id, user_id)
 
         if not environment:
             return JSONResponse(
@@ -62,10 +64,11 @@ def get_environment_by_id(environment_id: str):
 
 
 @router.post("/environments", response_model=AddEnvironmentResponse)
-def add_environment(request: AddEnvironmentRequest):
+def add_environment(request: AddEnvironmentRequest, Authorization: str = Header(None)):
     try:
+        request_user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        response = service.add_environment(request)
+        response = service.add_environment(request, request_user_id)
         return response
     except ValueError as e:
         raise HTTPException(status_code=400, detail={"message": str(e)})
@@ -76,17 +79,21 @@ def add_environment(request: AddEnvironmentRequest):
 
 
 @router.delete("/environments/{environment_id}", response_class=JSONResponse)
-def delete_environment(environment_id: str):
+def delete_environment(environment_id: str, Authorization: str = Header(None)):
     try:
+        request_user_id = decode_jwtheader(Authorization)
         service = EnvironmentsService()
-        deleted = service.delete_environment(environment_id)
+        deleted = service.delete_environment(environment_id, request_user_id)
         if not deleted:
             return JSONResponse(
-                status_code=404, content={"message": "Environment could not be deleted"}
+                status_code=403,
+                content={"message": "Not authorized to delete this environment"},
             )
         return JSONResponse(
             status_code=200, content={"message": "Environment deleted successfully"}
         )
+    except ValueError as e:
+        return JSONResponse(status_code=403, content={"message": str(e)})
     except Exception as e:
         import traceback
 
@@ -94,3 +101,16 @@ def delete_environment(environment_id: str):
         return JSONResponse(
             status_code=500, content={"message": f"Internal server error: {str(e)}"}
         )
+
+
+@router.get("/environments", response_class=JSONResponse)
+def get_environments_for_user(Authorization: str = Header(None)):
+    try:
+        user_id = decode_jwtheader(Authorization)
+        service = EnvironmentsService()
+        environments = service.get_environments_by_user(user_id)
+        return JSONResponse(status_code=200, content={"environments": environments})
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

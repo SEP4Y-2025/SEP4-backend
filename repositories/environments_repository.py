@@ -32,7 +32,6 @@ class EnvironmentsRepository:
 
     def insert_pot(self, environment_id: str, pot_data: dict):
         try:
-            # First, try to update the existing pot if it exists
             result = self.collection.update_one(
                 {
                     "_id": ObjectId(environment_id),
@@ -41,7 +40,6 @@ class EnvironmentsRepository:
                 {"$set": {"plant_pots.$": pot_data}},
             )
 
-            # If no pot was updated, insert the new one
             if result.matched_count == 0:
                 result = self.collection.update_one(
                     {"_id": ObjectId(environment_id)},
@@ -101,7 +99,7 @@ class EnvironmentsRepository:
             traceback.print_exc()
             return False
 
-    def add_environment(self, environment: dict) -> str:
+    def add_environment(self, environment: dict, request_user_id: str) -> str:
         try:
             result = self.collection.insert_one(environment)
             return str(result.inserted_id)
@@ -112,3 +110,13 @@ class EnvironmentsRepository:
     def delete_environment(self, environment_id: str):
         result = self.collection.delete_one({"_id": ObjectId(environment_id)})
         return result.deleted_count > 0
+
+    def environment_name_exists(self, user_id: str, name: str) -> bool:
+        try:
+            count = self.collection.count_documents(
+                {"owner_id": ObjectId(user_id), "name": name}
+            )
+            return count > 0
+        except Exception as e:
+            print(f"Error checking environment name: {e}")
+            return False

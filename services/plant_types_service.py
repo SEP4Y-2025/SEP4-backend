@@ -1,15 +1,30 @@
 # service/plant_types_service.py
 
 from repositories.plant_types_repository import PlantTypesRepository
+from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
+from services.auth_service import AuthService
 
 
 class PlantTypesService:
     def __init__(self):
         self.repository = PlantTypesRepository()
         self.arduinos = ArduinosRepository()
+        self.environments_repo = EnvironmentsRepository()
+        self.auth_service = AuthService()
 
-    def get_all_plant_types(self, environment_id: str):
+    def get_all_plant_types(self, environment_id: str, user_id: str):
+        allowed = False
+
+        if self.auth_service.check_user_permissions(user_id, environment_id):
+            allowed = True
+            return self.repository.get_plant_types_by_environment(environment_id)
+
+        if not allowed:
+            raise ValueError(
+                "User does not have permission to view plant types in this environment"
+            )
+
         plant_type_response = self.repository.get_plant_types_by_environment(
             environment_id
         )
