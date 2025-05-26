@@ -47,7 +47,8 @@ jobs:
         platforms: linux/amd64
         push: true
         tags: |
-          ${{ env.ACR_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag }}
+          ${{ env.ACR_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.event.inputs.tag || 'latest' }}
+
 
     - name: Delete existing ACI (if any)
       run: |
