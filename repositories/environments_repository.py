@@ -77,16 +77,13 @@ class EnvironmentsRepository:
             traceback.print_exc()
             return None
 
-    def update_pot(self, pot_id: str, update_data: dict):
-        try:
-            result = self.collection.update_one(
-                {"plant_pots.pot_id": pot_id},
-                {"$set": {f"plant_pots.$.{k}": v for k, v in update_data.items()}},
-            )
-            return result.modified_count > 0
-        except Exception as e:
-            traceback.print_exc()
-            return False
+    def update_pot(self, pot_id, update_data):
+        update_fields = {f"plant_pots.$.state.{k}": v for k, v in update_data.items()}
+        result = self.collection.update_one(
+            {"plant_pots.pot_id": pot_id},
+            {"$set": update_fields}
+        )
+        return result.modified_count > 0
 
     def delete_pot(self, pot_id: str):
         try:
