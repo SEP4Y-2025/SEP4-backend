@@ -14,6 +14,7 @@ def run_seed_data():
     collectionEnv = db["environments"]
     collectionPlantTypes = db["plant_types"]
     collectionUsers = db["users"]
+    collectionPlantData = db["plant_data"]
 
     # Initial Arduino data
     initial_arduinos = [
@@ -208,6 +209,7 @@ def run_seed_data():
     collectionPlantTypes.delete_many({})
     collectionEnv.delete_many({})
     collectionUsers.delete_many({})
+    collectionPlantData.delete_many({})
 
     collection.insert_many(initial_arduinos)
     collectionPlantTypes.insert_many(plant_types)

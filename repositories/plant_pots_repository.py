@@ -45,3 +45,13 @@ class PlantPotsRepository:
             {"plant_pots.pot_id": pot_id}, {"$pull": {"plant_pots": {"pot_id": pot_id}}}
         )
         return result.modified_count > 0
+    
+    def find_pot_by_id(self, pot_id: str):
+        try:
+            pot = self.env_collection.find_one({"plant_pots.pot_id": pot_id}, {"plant_pots.$": 1})
+            if pot and "plant_pots" in pot and len(pot["plant_pots"]) > 0:
+                return pot["plant_pots"][0].get("user_id")
+            return None
+        except Exception as e:
+            print(f"Error finding user by pot ID: {e}")
+            return None

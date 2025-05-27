@@ -75,6 +75,9 @@ class AuthService:
 
             print(f"Calling repository to create user {username}")
             user_id = self.auth_repository.create_user(user_data)
+            create_access_token = self.create_access_token(
+                data={"sub": username, "email": email, "id": str(user_id)}
+            )
             print(f"User created with ID: {user_id}")
             return user_id
         except Exception as e:

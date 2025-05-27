@@ -47,3 +47,25 @@ def test_get_plant_types_with_real_db(client, seeded_test_db):
         data = response.json()
         assert "PlantTypes" in data
         assert len(data["PlantTypes"]) == 3
+
+def test_add_environment_with_real_db(client, seeded_test_db):
+    with patch(
+        "api.controllers.environments_controller.decode_jwtheader",
+        return_value="662ebf49c7b9e2a7681e4a53",
+    ):
+        request_data = {
+            "name": "Integration Test Environment"
+        }
+        response = client.post(
+            "/environments",
+            json=request_data,
+            headers={"Authorization": "Bearer test_token"},
+        )
+        assert response.status_code == 200 or response.status_code == 201
+        data = response.json()
+        assert "environment_id" in data
+        assert data["name"] == "Integration Test Environment"
+
+        env = seeded_test_db["environments"].find_one({"_id": data["environment_id"]})
+        assert env is not None
+        assert env["name"] == "Integration Test Environment"
