@@ -1,12 +1,14 @@
 import os
 from bson import ObjectId
 import pytest
+
 os.environ["MONGO_URL"] = "mongodb://admin:password@localhost:27017"
 os.environ["MONGO_DB"] = "sep_test_database"
 from main import app
 from fastapi.testclient import TestClient
 from pymongo import MongoClient
 from unittest.mock import patch
+
 
 @pytest.fixture(scope="function")
 def seeded_test_db():
@@ -75,5 +77,3 @@ def test_add_environment_with_real_db(client, seeded_test_db):
         )
         assert env is not None
         assert env["name"] == "Integration Test Environment"
-
-

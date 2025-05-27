@@ -34,7 +34,7 @@ def service():
 
 def test_add_plant_pot_success(service):
     req = AddPlantPotRequest(
-        pot_id="pot_8", plant_pot_label="My Pot", plant_type_id=str(ObjectId())
+        pot_id="pot_1", plant_pot_label="My Pot", plant_type_id=str(ObjectId())
     )
     service.auth_service.check_user_permissions.return_value = True
     service.arduinos_repo.is_registered.return_value = True
@@ -46,6 +46,7 @@ def test_add_plant_pot_success(service):
     service.environments_repo.insert_pot.return_value = None
     service.arduinos_repo.mark_active.return_value = None
 
+    service.environments_repo.find_pot_by_id.return_value = None
     resp = service.add_plant_pot("env_1", req, "user_1")
     assert resp.pot_id == "pot_1"
     assert resp.plant_pot_label == "My Pot"
