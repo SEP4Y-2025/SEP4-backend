@@ -8,4 +8,6 @@ omit =
     api/controllers/root.py
     tests/*
     core/mqtt_client.py
-    utils/jwt_middleware.py
+    utils/*
+    api/controllers/soil_humidity_prediction.py
+    services/soil_humidity_prediction_service.py

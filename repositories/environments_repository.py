@@ -1,5 +1,5 @@
+import os
 from pymongo import MongoClient
-from core.config import MONGO_URI, DB_NAME
 from bson import ObjectId
 from utils.helper import convert_object_ids
 import traceback
@@ -7,9 +7,15 @@ import traceback
 
 class EnvironmentsRepository:
     def __init__(self):
-        self.client = MongoClient(MONGO_URI)
-        self.db = self.client[DB_NAME]
+        mongo_uri = os.environ.get(
+            "MONGO_URL", "mongodb://admin:password@localhost:27017"
+        )
+        db_name = os.environ.get("MONGO_DB", "sep_database")
+        self.client = MongoClient(mongo_uri)
+        self.db = self.client[db_name]
         self.collection = self.db["environments"]
+
+    # ...rest of your code...
 
     def get_environments(self):
         try:
@@ -80,8 +86,7 @@ class EnvironmentsRepository:
     def update_pot(self, pot_id, update_data):
         update_fields = {f"plant_pots.$.state.{k}": v for k, v in update_data.items()}
         result = self.collection.update_one(
-            {"plant_pots.pot_id": pot_id},
-            {"$set": update_fields}
+            {"plant_pots.pot_id": pot_id}, {"$set": update_fields}
         )
         return result.modified_count > 0
 

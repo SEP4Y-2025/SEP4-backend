@@ -71,7 +71,7 @@ class PlantPotsService:
                 "water_tank_capacity": 0,
                 "water_level": 0,
                 "measured_at": formatted_time,
-            }
+            },
         }
 
         self.environments_repo.insert_pot(environment_id, pot_doc)
@@ -91,13 +91,12 @@ class PlantPotsService:
     def get_plant_pot_by_id(
         self, env_id: str, pot_id: str, user_id: str
     ) -> GetPlantPotResponse:
-        
+
         if self.auth_service.check_user_permissions(user_id, env_id):
             pot = self.environments_repo.find_pot_by_id(pot_id)
 
         if not pot:
             raise ValueError(f"Plant pot with ID {pot_id} not found")
-        
 
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
         if not plant_type:
