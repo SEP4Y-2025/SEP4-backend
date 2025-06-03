@@ -3,6 +3,7 @@ import os
 from bson import ObjectId
 from datetime import datetime
 from utils.password_hash import hash_password
+from datetime import datetime, timedelta
 
 
 def run_seed_data():
@@ -204,6 +205,28 @@ def run_seed_data():
             "environments": [],
         },
     ]
+    
+    base_time = datetime.now()
+
+    sample_data = []
+    for i in range(10):
+        sample_data.append({
+            "plant_pot_id": "pot_1",
+            "temperature": 20 + i * 0.5,
+            "air_humidity": 30 + i,
+            "soil_humidity": 40 - i,
+            "light_intensity": 100 - i * 2,
+            "timestamp": base_time - timedelta(minutes=15 * i)
+        })
+        sample_data.append({
+            "plant_pot_id": "pot_2",
+            "temperature": 18 + i * 0.3,
+            "air_humidity": 35 + i,
+            "soil_humidity": 42 - i,
+            "light_intensity": 80 - i * 3,
+            "timestamp": base_time - timedelta(minutes=15 * i + 5)
+        })
+
 
     collection.delete_many({})
     collectionPlantTypes.delete_many({})
@@ -215,6 +238,7 @@ def run_seed_data():
     collectionPlantTypes.insert_many(plant_types)
     collectionEnv.insert_many(initial_envs)
     collectionUsers.insert_many(users)
+    collectionPlantData.insert_many(sample_data)
 
 
 run_seed_data()
