@@ -7,7 +7,8 @@ from models.plant_pot import (
 from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
 from repositories.plant_types_repository import PlantTypesRepository
-from repositories.sensor_readings_repository import SensorReadingsRepository
+#from repositories.sensor_readings_repository import SensorReadingsRepository
+from repositories.plant_data_repository import PlantDataRepository
 from core.mqtt_client import mqtt_client
 import json, time, uuid, queue
 import datetime
@@ -19,7 +20,8 @@ class PlantPotsService:
         self.environments_repo = EnvironmentsRepository()
         self.arduinos_repo = ArduinosRepository()
         self.plant_types_repo = PlantTypesRepository()
-        self.sensor_readings_repo = SensorReadingsRepository()
+        #self.sensor_readings_repo = SensorReadingsRepository()
+        self.sensor_readings_repo = PlantDataRepository()
         self.auth_service = AuthService()
 
     def add_plant_pot(

@@ -42,3 +42,16 @@ class PlantDataRepository:
             traceback.print_exc()
             print(f"Error fetching all plant data: {e}")
             return []
+
+    def get_historical_data(self, pot_id: str):
+        readings = list(
+            self.collection.find({"plant_pot_id": pot_id})
+            .sort("timestamp", -1)
+            .limit(10)
+        )
+        return readings
+
+    def delete_by_pot(self, pot_id: str):
+        # Delete all sensor readings associated with the given pot_id
+        result = self.collection.delete_many({"plant_pot_id": pot_id})
+        return result.deleted_count  # Return the number of documents deleted
