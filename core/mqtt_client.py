@@ -5,7 +5,8 @@ import paho.mqtt.client as mqtt
 from urllib.parse import urlparse
 from core.config import MQTT_BROKER_URL, MONGO_URI, DB_NAME
 from pymongo import MongoClient
-from repositories.sensor_readings_repository import SensorReadingsRepository
+from repositories.plant_data_repository import PlantDataRepository
+
 from repositories.environments_repository import EnvironmentsRepository
 from repositories.arduinos_repository import ArduinosRepository
 
@@ -20,7 +21,7 @@ class MQTTClient:
         self.client = mqtt.Client(client_id="backend")
         self.response_queues = {}  # Dictionary to hold response queues for each request
         self.client.on_message = self.on_message
-        self.sensor_readings_repo = SensorReadingsRepository()
+        self.sensor_readings_repo = PlantDataRepository()
         self.environments_repo = EnvironmentsRepository()
         self.arduinos_repo = ArduinosRepository()
 

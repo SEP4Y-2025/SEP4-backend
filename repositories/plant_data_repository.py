@@ -55,3 +55,7 @@ class PlantDataRepository:
         # Delete all sensor readings associated with the given pot_id
         result = self.collection.delete_many({"plant_pot_id": pot_id})
         return result.deleted_count  # Return the number of documents deleted
+    
+    def create(self, data: dict):
+        result = self.collection.insert_one(data)
+        return str(result.inserted_id)
