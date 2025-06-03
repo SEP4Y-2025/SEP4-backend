@@ -46,10 +46,10 @@ class PlantPotsService:
             "water_dosage": plant_type["water_dosage"],
         }
 
-        # result = mqtt_client.send(f"/{pot.pot_id}/activate", payload)
+        result = mqtt_client.send(f"/{pot.pot_id}/activate", payload)
 
-        # if result.get("error"):
-        #     raise ValueError(result["error"])
+        if result.get("error"):
+            raise ValueError(result["error"])
 
         timestamp = time.time()
         dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
@@ -101,6 +101,12 @@ class PlantPotsService:
         plant_type = self.plant_types_repo.get_plant_type_by_id(pot["plant_type_id"])
         if not plant_type:
             raise ValueError("Invalid plant type ID")
+        
+        payload = {}
+        result = mqtt_client.send(f"/{pot_id}/data", payload)
+
+        if result.get("error"):
+            raise ValueError(result["error"])
 
         return GetPlantPotResponse(
             pot_id=pot_id,
@@ -145,10 +151,10 @@ class PlantPotsService:
 
         # Send MQTT delete command
         payload = {}
-        # result = mqtt_client.send(f"/{pot_id}/deactivate", payload)
+        result = mqtt_client.send(f"/{pot_id}/deactivate", payload)
 
-        # if result.get("error"):
-        #     raise ValueError(result["error"])
+        if result.get("error"):
+            raise ValueError(result["error"])
 
         # Delete sensor readings related to this pot from the sensor_readings collection
         deleted_count = self.sensor_readings_repo.delete_by_pot(pot_id)
