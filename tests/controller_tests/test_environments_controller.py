@@ -23,9 +23,16 @@ def test_get_environment_by_id_success(client):
         "services.environments_service.EnvironmentsService.get_environment_by_id",
         return_value=mock_environment,
     ):
-        response = client.get("/environments/680f8359688cb5341f9f9c19")
-        assert response.status_code == 200
-        assert response.json() == {"environment": mock_environment}
+        with patch(
+            "api.controllers.environments_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/680f8359688cb5341f9f9c19",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == {"environment": mock_environment}
 
 
 def test_get_environment_by_id_not_found(client):
@@ -33,9 +40,16 @@ def test_get_environment_by_id_not_found(client):
         "services.environments_service.EnvironmentsService.get_environment_by_id"
     ) as mock_service:
         mock_service.return_value = None
-        response = client.get("/environments/680f8359688cb5341f9f9c19")
-        assert response.status_code == 404
-        assert response.json() == {"message": "Environment not found"}
+        with patch(
+            "api.controllers.environments_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.get(
+                "/environments/680f8359688cb5341f9f9c19",
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 404
+            assert response.json() == {"message": "Environment not found"}
 
 
 def test_add_environment_success(client):
@@ -51,9 +65,17 @@ def test_add_environment_success(client):
         "services.environments_service.EnvironmentsService.add_environment",
         return_value=mock_response,
     ):
-        response = client.post("/environments", json=payload)
-        assert response.status_code == 200
-        assert response.json() == mock_response
+        with patch(
+            "api.controllers.environments_controller.decode_jwtheader",
+            return_value="mock_user_id",
+        ):
+            response = client.post(
+                "/environments",
+                json=payload,
+                headers={"Authorization": "Bearer test_token"},
+            )
+            assert response.status_code == 200
+            assert response.json() == mock_response
 
 
 def test_add_environment_missing_name(client):

@@ -42,6 +42,16 @@ class MQTTClient:
         }
         # Store the sensor data in the database
         self.sensor_readings_repo.create(sensor_data)
+        self.environments_repo.update_pot(
+            data.get("plant_pot_id"),
+            {
+                "temperature": data.get("temperature"),
+                "air_humidity": data.get("air_humidity"),
+                "soil_humidity": data.get("soil_humidity"),
+                "light_intensity": data.get("light_intensity"),
+                "measured_at": formatted_time,
+            },
+        )
         return
 
     def handle_get_pot_data(self, data):
@@ -66,7 +76,6 @@ class MQTTClient:
         print(f"Pots: {self.environments_repo.find_pot_by_id(pot_id)}")
 
         if result == False:
-            # print(f"Pot ID {pot_id} not updated")
             raise ValueError(f"Pot ID {pot_id} not found")
 
     def on_message(self, client, userdata, msg):

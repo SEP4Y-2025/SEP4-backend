@@ -1,14 +1,16 @@
 from datetime import datetime, timezone, timedelta
+import traceback
 from typing import Optional
 import jwt
 from passlib.context import CryptContext
 from repositories.auth_repository import AuthRepository
+from repositories.users_repository import UsersRepository
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-SECRET_KEY = "secret-key"  # Replace with your actual secret key | haha, nice
+SECRET_KEY = "secret-key"  # Replace with your actual secret key
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -16,6 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 class AuthService:
     def __init__(self):
         self.auth_repository = AuthRepository()
+        self.users_repository = UsersRepository()
 
     def verify_password(self, plain_password, hashed_password):
         return pwd_context.verify(plain_password, hashed_password)
@@ -72,24 +75,27 @@ class AuthService:
 
             print(f"Calling repository to create user {username}")
             user_id = self.auth_repository.create_user(user_data)
+            create_access_token = self.create_access_token(
+                data={"sub": username, "email": email, "id": str(user_id)}
+            )
             print(f"User created with ID: {user_id}")
             return user_id
         except Exception as e:
-            import traceback
 
-            print(f"Error creating user: {str(e)}")
             print(traceback.format_exc())
             return None
 
-    def change_password(self, email: str, old_password: str, new_password: str):
-        user = self.auth_repository.find_user_by_email(email)
+    def change_password(self, user_id: str, old_password: str, new_password: str):
+        user = self.auth_repository.find_user_by_id(user_id)
         if not user:
-            print(f"User {email} not found")
             return False
         if not self.verify_password(old_password, user["password"]):
             return False
         new_hashed = self.get_password_hash(new_password)
-        return self.auth_repository.update_user_password(email, new_hashed)
+        return self.auth_repository.update_user_password(user_id, new_hashed)
 
-    # def find_user_by_email(self, email: str):
-    #     return self.auth_repository.find_user_by_email(email)
+    def check_user_permissions(self, user_id: str, environment_id: str):
+        role = self.users_repository.get_user_role(user_id, environment_id)
+        if role == "Owner" or role == "Plant Assistant":
+            return True
+        return False

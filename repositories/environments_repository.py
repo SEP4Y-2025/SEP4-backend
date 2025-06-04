@@ -1,5 +1,5 @@
+import os
 from pymongo import MongoClient
-from core.config import MONGO_URI, DB_NAME
 from bson import ObjectId
 from utils.helper import convert_object_ids
 import traceback
@@ -7,9 +7,15 @@ import traceback
 
 class EnvironmentsRepository:
     def __init__(self):
-        self.client = MongoClient(MONGO_URI)
-        self.db = self.client[DB_NAME]
+        mongo_uri = os.environ.get(
+            "MONGO_URL", "mongodb://admin:password@localhost:27017"
+        )
+        db_name = os.environ.get("MONGO_DB", "sep_database")
+        self.client = MongoClient(mongo_uri)
+        self.db = self.client[db_name]
         self.collection = self.db["environments"]
+
+    # ...rest of your code...
 
     def get_environments(self):
         try:
@@ -32,7 +38,6 @@ class EnvironmentsRepository:
 
     def insert_pot(self, environment_id: str, pot_data: dict):
         try:
-            # First, try to update the existing pot if it exists
             result = self.collection.update_one(
                 {
                     "_id": ObjectId(environment_id),
@@ -41,7 +46,6 @@ class EnvironmentsRepository:
                 {"$set": {"plant_pots.$": pot_data}},
             )
 
-            # If no pot was updated, insert the new one
             if result.matched_count == 0:
                 result = self.collection.update_one(
                     {"_id": ObjectId(environment_id)},
@@ -79,16 +83,12 @@ class EnvironmentsRepository:
             traceback.print_exc()
             return None
 
-    def update_pot(self, pot_id: str, update_data: dict):
-        try:
-            result = self.collection.update_one(
-                {"plant_pots.pot_id": pot_id},
-                {"$set": {f"plant_pots.$.{k}": v for k, v in update_data.items()}},
-            )
-            return result.modified_count > 0
-        except Exception as e:
-            traceback.print_exc()
-            return False
+    def update_pot(self, pot_id, update_data):
+        update_fields = {f"plant_pots.$.state.{k}": v for k, v in update_data.items()}
+        result = self.collection.update_one(
+            {"plant_pots.pot_id": pot_id}, {"$set": update_fields}
+        )
+        return result.modified_count > 0
 
     def delete_pot(self, pot_id: str):
         try:
@@ -101,7 +101,7 @@ class EnvironmentsRepository:
             traceback.print_exc()
             return False
 
-    def add_environment(self, environment: dict) -> str:
+    def add_environment(self, environment: dict, request_user_id: str) -> str:
         try:
             result = self.collection.insert_one(environment)
             return str(result.inserted_id)
@@ -112,3 +112,13 @@ class EnvironmentsRepository:
     def delete_environment(self, environment_id: str):
         result = self.collection.delete_one({"_id": ObjectId(environment_id)})
         return result.deleted_count > 0
+
+    def environment_name_exists(self, user_id: str, name: str) -> bool:
+        try:
+            count = self.collection.count_documents(
+                {"owner_id": ObjectId(user_id), "name": name}
+            )
+            return count > 0
+        except Exception as e:
+            print(f"Error checking environment name: {e}")
+            return False

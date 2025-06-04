@@ -4,6 +4,9 @@ from pydantic import BaseModel
 
 class AddEnvironmentRequest(BaseModel):
     name: str
+    window_state: str = "closed"
+    access_control: list = []
+    plant_pots: list = []
 
 
 class AddEnvironmentResponse(BaseModel):

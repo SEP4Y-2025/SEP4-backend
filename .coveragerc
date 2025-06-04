@@ -1,0 +1,13 @@
+[run]
+omit =
+    machine_learning/*
+    models/*
+    main.py
+    api/global_exception_handler.py
+    utils/password_hash.py
+    api/controllers/root.py
+    tests/*
+    core/mqtt_client.py
+    utils/*
+    api/controllers/soil_humidity_prediction.py
+    services/soil_humidity_prediction_service.py

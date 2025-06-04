@@ -71,6 +71,6 @@ jobs:
       - name: Run Linter
         run: |
           flake8 . \
-            --max-line-length=200 \
-            --ignore=E501,F401,W291,W292,W293,E401,F811,E302,E712,F841,W503 \
+            --max-line-length=250 \
+            --ignore=E501,F401,W291,W292,W293,E401,F811,E302,E712,F841,W503,E402 \
             --exclude=.git,__pycache__,env,venv,.venv

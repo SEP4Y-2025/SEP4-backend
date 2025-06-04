@@ -8,17 +8,16 @@ class PlantTypesRepository:
     def __init__(self):
         self.client = MongoClient(MONGO_URI)
         self.db = self.client[DB_NAME]
-        self.env_collection = self.db["environments"]  # for environments
-        self.plant_type_collection = self.db["plant_types"]  # for plant types
+        self.env_collection = self.db["environments"]
+        self.plant_type_collection = self.db["plant_types"]
 
     def get_plant_type_by_id(self, plant_type_id: str):
         return self.plant_type_collection.find_one({"_id": ObjectId(plant_type_id)})
 
     def get_environment_by_id(self, environment_id: str):
         try:
-            env_obj_id = ObjectId(environment_id)  # Convert to ObjectId
+            env_obj_id = ObjectId(environment_id)
             environment = self.env_collection.find_one({"_id": env_obj_id})
-            print(f"Environment found: {environment}")
             return environment
         except Exception as e:
             print(f"Error fetching environment by ID: {e}")
